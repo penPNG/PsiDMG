@@ -1,7 +1,7 @@
 #include "dmg.h"
-#include "imgui.h"
-#include "imgui_impl_sdl3.h"
-#include "imgui_impl_sdlrenderer3.h"
+#include "imgui/imgui.h"
+#include "imgui/imgui_impl_sdl3.h"
+#include "imgui/imgui_impl_sdlrenderer3.h"
 #include <stdlib.h>
 #include <vulkan/vulkan.h>
 #include <stdio.h>
