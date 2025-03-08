@@ -15,5 +15,6 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_subdirectory(src)
+add_subdirectory(vendor)
 
 # TODO: Add tests and install targets if needed.
