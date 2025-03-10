@@ -4,9 +4,9 @@ typedef unsigned char byte;
 typedef unsigned short word;
 
 union Register {
-	word reg;
+	word reg;	// Combined Registers
 	struct {
-		byte lo;
-		byte hi;
+		byte lo;	// First Byte (B)
+		byte hi;	// Last Byte (C)
 	};
 };
