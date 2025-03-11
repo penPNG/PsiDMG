@@ -18,7 +18,7 @@ int main(char* argv) {
 	Uint32 window_flags = SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIDDEN;
 	SDL_Window* window = SDL_CreateWindow("Dear Imgui SDL3+SDL_Renderer example", 1280, 720, window_flags);
 	if (window == NULL) {
-		printf("Error: SDL_CreateWindow(): %s\m", SDL_GetError());
+		printf("Error: SDL_CreateWindow(): %s\n", SDL_GetError());
 		return -1;
 	}
 	SDL_Renderer* renderer = SDL_CreateRenderer(window, NULL);

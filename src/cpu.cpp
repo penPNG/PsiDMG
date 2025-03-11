@@ -50,138 +50,138 @@ void CPU::setPCLo(byte d) { registers.regPC.lo = d; }	// Set Lo byte of PC
 void CPU::setPCHi(byte d) { registers.regPC.hi = d; }	// Set Hi byte of PC
 // -------------------
 
-constexpr void CPU::initInst() {
+void CPU::initInst() {
 	// Control Instructions
-	inst[0x00] = NOP; inst[0x10] = STOP;
-	inst[0xC8] = PREF; inst[0xF3] = DI;
-	inst[0xF8] = EI;
+	inst[0x00] = &NOP; inst[0x10] = &STOP;
+	inst[0xC8] = &PREF; inst[0xF3] = &DI;
+	inst[0xF8] = &EI;
 
 	// Jumps / Calls
-	for (byte i = 0x18; i < 0x39; i += 0x8) { inst[i] = JR; }
-	for (byte i = 0xC0; i < 0xD7; i += 0x8) { inst[i] = RET; }
-	inst[0xC9] = RET; inst[0xD9] = RETI;
-	for (byte i = 0xC2; i < 0xDB; i += 0x8) { inst[i] = JP; }
-	inst[0xC3] = JP; inst[0xE9] = JP;
-	for (byte i = 0xC4; i < 0xDD; i += 0x8) { inst[i] = CALL; }
-	inst[0xCD] = CALL;
-	for (byte i = 0xC7; i <= 0xFF; i += 0x8) { inst[i] = RST; }
+	for (byte i = 0x18; i < 0x39; i += 0x8) { inst[i] = &JR; }
+	for (byte i = 0xC0; i < 0xD7; i += 0x8) { inst[i] = &RET; }
+	inst[0xC9] = &RET;
+	for (byte i = 0xC2; i < 0xDB; i += 0x8) { inst[i] = &JP; }
+	inst[0xC3] = &JP; inst[0xE9] = &JP;
+	for (byte i = 0xC4; i < 0xDD; i += 0x8) { inst[i] = &CALL; }
+	inst[0xCD] = &CALL;
+	for (byte i = 0xC7; i <= 0xFF; i += 0x8) { inst[i] = &RST; }
 
 	// Load Instructions
-	for (byte i = 0x02; i < 0x3F; i += 0x4) { inst[i] = LD; }
+	for (byte i = 0x02; i < 0x3F; i += 0x4) { inst[i] = &LD; }
 	for (byte i = 0x40; i < 0x80; i++) {
 		if (i == 0x76) {
-			inst[i] = HALT;
+			inst[i] = &HALT;
 		}
-		inst[i] = LD;
+		inst[i] = &LD;
 	}
 
 	// 16 bit Load Instructions
-	for (byte i = 0x01; i < 0x32; i += 0xF) { inst[i] = LD16; }
-	inst[0x08] = LD16;
+	for (byte i = 0x01; i < 0x32; i += 0xF) { inst[i] = &LD16; }
+	inst[0x08] = &LD16;
 	for (byte i = 0xC1; i < 0xF6; i += 0xB) {
-		inst[i] = POP; i+=4;
-		inst[i] = PUSH;
+		inst[i] = &POP; i+=4;
+		inst[i] = &PUSH;
 	}
-	inst[0xF8] = LD16; inst[0xF9] = LD16;
+	inst[0xF8] = &LD16; inst[0xF9] = &LD16;
 
 	// Arithmetic Instructions
-	for (byte i = 0x04; i < 0x3D; i += 0xF) { inst[i] = INC; }
-	for (byte i = 0x05; i < 0x3E; i += 0xF) { inst[i] = DEC; }
-	inst[0x2F] = CPL; inst[0x3F] = CCF;
+	for (byte i = 0x04; i < 0x3D; i += 0xF) { inst[i] = &INC; }
+	for (byte i = 0x05; i < 0x3E; i += 0xF) { inst[i] = &DEC; }
+	inst[0x2F] = &CPL; inst[0x3F] = &CCF;
 	for (byte i = 0x80; i < 0xC0; i++) {
-		if (i < 0x88) { inst[i] = ADD; continue; }
-		if (i < 0x90) { inst[i] = ADC; continue; }
-		if (i < 0x98) { inst[i] = SUB; continue; }
-		if (i < 0xA0) { inst[i] = SBC; continue; }
-		if (i < 0xA8) { inst[i] = AND; continue; }
-		if (i < 0xB0) { inst[i] = XOR; continue; }
-		if (i < 0xB8) { inst[i] = OR; continue; }
-		inst[i] = CP;
+		if (i < 0x88) { inst[i] = &ADD; continue; }
+		if (i < 0x90) { inst[i] = &ADC; continue; }
+		if (i < 0x98) { inst[i] = &SUB; continue; }
+		if (i < 0xA0) { inst[i] = &SBC; continue; }
+		if (i < 0xA8) { inst[i] = &AND; continue; }
+		if (i < 0xB0) { inst[i] = &XOR; continue; }
+		if (i < 0xB8) { inst[i] = &OR; continue; }
+		inst[i] = &CP;
 	}
-	inst[0x27] = DAA; inst[0x2F] = CPL;
-	inst[0x37] = SCF; inst[0x3F] = CCF;
-	inst[0xC6] = ADD; inst[0xCE] = ADC;
-	inst[0xD6] = SUB; inst[0xDE] = SBC;
-	inst[0xE6] = AND; inst[0xEE] = XOR;
-	inst[0xF6] = OR; inst[0xFE] = CP;
+	inst[0x27] = &DAA; inst[0x2F] = &CPL;
+	inst[0x37] = &SCF; inst[0x3F] = &CCF;
+	inst[0xC6] = &ADD; inst[0xCE] = &ADC;
+	inst[0xD6] = &SUB; inst[0xDE] = &SBC;
+	inst[0xE6] = &AND; inst[0xEE] = &XOR;
+	inst[0xF6] = &OR; inst[0xFE] = &CP;
 
 	// 16 bit Arithmetic
-	for (byte i = 0x03; i < 0x3C; i += 0xF) { inst[i] = INC16; }
-	for (byte i = 0x09; i < 0x3A; i += 0xF) { inst[i] = ADD16; }
-	for (byte i = 0x0B; i < 0x3C; i += 0xF) { inst[i] = DEC16; }
-	inst[0xE8] = ADD16;
+	for (byte i = 0x03; i < 0x3C; i += 0xF) { inst[i] = &INC16; }
+	for (byte i = 0x09; i < 0x3A; i += 0xF) { inst[i] = &ADD16; }
+	for (byte i = 0x0B; i < 0x3C; i += 0xF) { inst[i] = &DEC16; }
+	inst[0xE8] = &ADD16;
 }
 
 // Instructions
 // ------------
 
 // Load
-void CPU::LD(word) { }
+void CPU::LD(word op) { printf("LD: %X", op); }
 
-void CPU::LD16(word) {}
+void CPU::LD16(word op) { printf("LD16: %X", op); }
 
-void CPU::POP(word) {}
+void CPU::POP(word op) { printf("POP: %X", op); }
 
-void CPU::PUSH(word) {}
+void CPU::PUSH(word op) { printf("PUSH: %X", op); }
 
 // Arithmetic
-void CPU::ADD(word) {}
+void CPU::ADD(word op) { printf("ADD: %X", op); }
 
-void CPU::ADC(word) {}
+void CPU::ADC(word op) { printf("ADC: %X", op); }
 
-void CPU::ADD16(word) {}
+void CPU::ADD16(word op) { printf("ADD16: %X", op); }
 
-void CPU::SUB(word) {}
+void CPU::SUB(word op) { printf("SUB: %X", op); }
 
-void CPU::SBC(word) {}
+void CPU::SBC(word op) { printf("SBC: %X", op); }
 
-void CPU::AND(word) {}
+void CPU::AND(word op) { printf("AND: %X", op); }
 
-void CPU::XOR(word) {}
+void CPU::XOR(word op) { printf("XOR: %X", op); }
 
-void CPU::OR(word) {}
+void CPU::OR(word op) { printf("OR: %X", op); }
 
-void CPU::CP(word) {}
+void CPU::CP(word op) { printf("CP: %X", op); }
 
-void CPU::INC(word) {}
+void CPU::INC(word op) { printf("INC: %X", op); }
 
-void CPU::INC16(word) {}
+void CPU::INC16(word op) { printf("INC16: %X", op); }
 
-void CPU::DEC(word) {}
+void CPU::DEC(word op) { printf("DEC: %X", op); }
 
-void CPU::DEC16(word) {}
+void CPU::DEC16(word op) { printf("DEC16: %X", op); }
 
-void CPU::CPL(word) {}
+void CPU::CPL(word op) { printf("CPL: %X", op); }
 
-void CPU::CCF(word) {}
+void CPU::CCF(word op) { printf("CCF: %X", op); }
 
-void CPU::DAA(word) {}
+void CPU::DAA(word op) { printf("DAA: %X", op); }
 
-void CPU::SCF(word) {}
+void CPU::SCF(word op) { printf("SCF: %X", op); }
 
 // Control
-void CPU::NOP(word) {}
+void CPU::NOP(word op) { printf("NOP: %X", op); }
 
-void CPU::STOP(word) {}
+void CPU::STOP(word op) { printf("STOP: %X", op); }
 
-void CPU::HALT(word) {}
+void CPU::HALT(word op) { printf("HALT: %X", op); }
 
-void CPU::PREF(word) {}
+void CPU::PREF(word op) { printf("PREF: %X", op); }
 
-void CPU::DI(word) {}
+void CPU::DI(word op) { printf("DI: %X", op); }
 
-void CPU::EI(word) {}
+void CPU::EI(word op) { printf("EI: %X", op); }
 
 // Jump / Call
-void CPU::JR(word) {}
+void CPU::JR(word op) { printf("JR: %X", op); }
 
-void CPU::JP(word) {}
+void CPU::JP(word op) { printf("JP: %X", op); }
 
-void CPU::CALL(word) {}
+void CPU::CALL(word op) { printf("CALL: %X", op); }
 
-void CPU::RST(word) {}
+void CPU::RST(word op) { printf("RST: %X", op); }
 
-void CPU::RET(word) {}
+void CPU::RET(word op) { printf("RET: %X", op); }
 
-void CPU::RETI(word) {}
+void CPU::RETI(word op) { printf("RETI: %X", op); }
 // ------------

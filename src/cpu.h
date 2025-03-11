@@ -10,7 +10,6 @@
 
 struct Registers {
 	Register regAF;
-	Register regAF;
 	Register regBC;
 	Register regDE;
 	Register regHL;
@@ -22,7 +21,7 @@ class CPU {
 public:
 	CPU();
 
-	void (CPU::*inst[256]) (word);
+	void (*inst[256]) (word);
 
 	// Regiseter Functions
 	// -------------------
@@ -64,48 +63,48 @@ public:
 	// -------------------
 
 private:
-	constexpr void initInst();
+	void initInst();
 
 	// Load
-	void LD(word);
-	void LD16(word);
-	void POP(word);
-	void PUSH(word);
+	static void LD(word);
+	static void LD16(word);
+	static void POP(word);
+	static void PUSH(word);
 
 	// Arithmetic
-	void ADD(word);		// ADD Operation
-	void ADC(word);		// ADD with Carry
-	void ADD16(word);	// 16 bit ADD Operation
-	void SUB(word);		// SUB Operation
-	void SBC(word);		// SUB with Carry
-	void AND(word);		// AND Operation
-	void XOR(word);		// ... TODO FINISH NOTES
-	void OR(word);
-	void CP(word);
-	void INC(word);
-	void INC16(word);	// 16 bit INC Operation
-	void DEC(word);
-	void DEC16(word);	// 16 bit DEC operation
-	void CPL(word);		// One's complement register A
-	void CCF(word);		// Flip the carry flag CY
-	void DAA(word);		// Adjust BCD of register A
-	void SCF(word);		// Set the carry flag CY
+	static void ADD(word);		// ADD Operation
+	static void ADC(word);		// ADD with Carry
+	static void ADD16(word);	// 16 bit ADD Operation
+	static void SUB(word);		// SUB Operation
+	static void SBC(word);		// SUB with Carry
+	static void AND(word);		// AND Operation
+	static void XOR(word);		// ... TODO FINISH NOTES
+	static void OR(word);
+	static void CP(word);
+	static void INC(word);
+	static void INC16(word);	// 16 bit INC Operation
+	static void DEC(word);
+	static void DEC16(word);	// 16 bit DEC operation
+	static void CPL(word);		// One's complement register A
+	static void CCF(word);		// Flip the carry flag CY
+	static void DAA(word);		// Adjust BCD of register A
+	static void SCF(word);		// Set the carry flag CY
 
 	// Control
-	void NOP(word);		// Advance PC by one
-	void STOP(word);	// Stop the clock... chaos ensues
-	void HALT(word);
-	void PREF(word);	// See CB Instructions
-	void DI(word);		// Disable Interupts
-	void EI(word);		// Enable Interupts
+	static void NOP(word);		// Advance PC by one
+	static void STOP(word);	// Stop the clock... chaos ensues
+	static void HALT(word);
+	static void PREF(word);	// See CB Instructions
+	static void DI(word);		// Disable Interupts
+	static void EI(word);		// Enable Interupts
 
 	// Jump / Call
-	void JR(word);		// Jump Relative
-	void JP(word);		// Jump Absolute
-	void CALL(word);	// Call
-	void RST(word);		// Reset?
-	void RET(word);		// Return from call
-	void RETI(word);	// Return with interupts
+	static void JR(word);		// Jump Relative
+	static void JP(word);		// Jump Absolute
+	static void CALL(word);	// Call
+	static void RST(word);		// Reset?
+	static void RET(word);		// Return from call
+	static void RETI(word);	// Return with interupts
 
 private:
 	Registers registers;
