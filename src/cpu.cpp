@@ -111,3 +111,77 @@ constexpr void CPU::initInst() {
 	for (byte i = 0x0B; i < 0x3C; i += 0xF) { inst[i] = DEC16; }
 	inst[0xE8] = ADD16;
 }
+
+// Instructions
+// ------------
+
+// Load
+void CPU::LD(word) { }
+
+void CPU::LD16(word) {}
+
+void CPU::POP(word) {}
+
+void CPU::PUSH(word) {}
+
+// Arithmetic
+void CPU::ADD(word) {}
+
+void CPU::ADC(word) {}
+
+void CPU::ADD16(word) {}
+
+void CPU::SUB(word) {}
+
+void CPU::SBC(word) {}
+
+void CPU::AND(word) {}
+
+void CPU::XOR(word) {}
+
+void CPU::OR(word) {}
+
+void CPU::CP(word) {}
+
+void CPU::INC(word) {}
+
+void CPU::INC16(word) {}
+
+void CPU::DEC(word) {}
+
+void CPU::DEC16(word) {}
+
+void CPU::CPL(word) {}
+
+void CPU::CCF(word) {}
+
+void CPU::DAA(word) {}
+
+void CPU::SCF(word) {}
+
+// Control
+void CPU::NOP(word) {}
+
+void CPU::STOP(word) {}
+
+void CPU::HALT(word) {}
+
+void CPU::PREF(word) {}
+
+void CPU::DI(word) {}
+
+void CPU::EI(word) {}
+
+// Jump / Call
+void CPU::JR(word) {}
+
+void CPU::JP(word) {}
+
+void CPU::CALL(word) {}
+
+void CPU::RST(word) {}
+
+void CPU::RET(word) {}
+
+void CPU::RETI(word) {}
+// ------------

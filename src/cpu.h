@@ -1,5 +1,6 @@
 #pragma once
 #include "ds.h"
+#include <stdio.h>
 
 // Flags
 #define FLAG_Z 0b10000000
