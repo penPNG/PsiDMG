@@ -21,7 +21,8 @@ class CPU {
 public:
 	CPU();
 
-	void (*inst[256]) (word);
+	inline static void (*inst[256]) (word);
+	inline static void (*CBInst[256]) (word);
 
 	// Regiseter Functions
 	// -------------------
@@ -67,6 +68,7 @@ private:
 
 	// Load
 	static void LD(word);
+	static void LDH(word);
 	static void LD16(word);
 	static void POP(word);
 	static void PUSH(word);
@@ -92,19 +94,40 @@ private:
 
 	// Control
 	static void NOP(word);		// Advance PC by one
-	static void STOP(word);	// Stop the clock... chaos ensues
+	static void STOP(word);		// Stop the clock... chaos ensues
 	static void HALT(word);
-	static void PREF(word);	// See CB Instructions
 	static void DI(word);		// Disable Interupts
 	static void EI(word);		// Enable Interupts
 
 	// Jump / Call
 	static void JR(word);		// Jump Relative
 	static void JP(word);		// Jump Absolute
-	static void CALL(word);	// Call
+	static void CALL(word);		// Call
 	static void RST(word);		// Reset?
 	static void RET(word);		// Return from call
-	static void RETI(word);	// Return with interupts
+	static void RETI(word);		// Return with interupts
+
+	// Bit Manipulation
+	static void RLCA(word);
+	static void RLA(word);
+	static void RRCA(word);
+	static void RRA(word);
+	static void PREF(word);
+
+	// CB Instructions
+	static void RLC(word);
+	static void RRC(word);
+	static void RL(word);
+	static void RR(word);
+	static void SLA(word);
+	static void SRA(word);
+	static void SWAP(word);
+	static void SRL(word);
+	static void BIT(word);
+	static void RES(word);
+	static void SET(word);
+
+	static void no(word);
 
 private:
 	Registers registers;
