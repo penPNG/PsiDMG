@@ -133,48 +133,77 @@ void CPU::initInst() {
 
 // Instructions
 // ------------
+// Load standard
 byte CPU::LD(reg8 x, reg8 y) { 
 	printf("LDH: %d %d", x, y);
 
 	set8(x, get8(y));
+	return 4;
 }
 
+// Load Immediate to Register
 byte CPU::LDI(reg8 reg, byte b) { 
 	printf("LDI: %d %d", reg, b); 
 
 	set8(reg, b);
+	return 8;
 }
 
+// Load Immediate to Memory
+byte CPU::LDMI(word addr, byte b) {
+	printf("LDMI: %d %d", addr, b);
+
+	setRam(addr, b);
+	return 12;
+}
+
+// Load to Register from Memory
 byte CPU::LDRM(reg8 reg, word addr) {
 	printf("LDRM: %d %d", reg, addr);
 
 	set8(reg, ram.ram[addr]);
+	return 8;
 }
 
+// Load to Memory from Register
 byte CPU::LDMR(word addr, reg8 reg) {
 	printf("LDMR: %d %d", addr, reg);
 
 	ram.ram[addr] = get8(reg);
+	return 8;
 }
 
+// Load 16 Bit Immediate
 byte CPU::LD16(reg16 reg, word w) {
 	printf("LD16: %d %d", reg, w);
 
 	set16(reg, w);
+	return 12;
 }
 
+// Load to SP from HL
 byte CPU::LD16SPHL() {
 	printf("LD16SPHL: %d %d", get16(SP), get16(HL));
 
 	set16(SP, get16(HL));
+	return 8;
 }
 
+// Load to HL from SP + Signed Byte
 byte CPU::LD16HLSP(sbyte sb) {
-	printf("LD16HLSP: %d %d %d", get16(HL), get16(SP), sb);
+	byte sp;
+	printf("LD16HLSP: %d %d %d", get16(HL), sp = get16(SP), sb);
 
-	set16(HL, get16(SP)+sb);
+	word res = sp+sb;
+	setZ(0); setN(0);
+	setH(((sp&0x0F)+(sb&0x0F)) & 0x10);
+	setC(res & 0x0100);
+
+	set16(HL, res);
+	return 12;
 }
 
+// LOAD to Memory from SP
 byte CPU::LD16MSP(word addr) {
 	printf("LD16HLSP: %d %d", addr, get16(SP));
 
@@ -201,9 +230,9 @@ byte CPU::PUSH(reg16 reg) {
 byte CPU::ADD(reg8 reg) { 
 	byte a, n;
 	printf("ADD: %d %d", a = get8(A), n = get8(reg));
+
 	word res = a+n;
-	
-	setZ(res==0); setN(false);
+	setZ(res==0); setN(0);
 	setH(((a&0x0F)+(n&0x0F)) & 0x10);
 	setC(res & 0x0100);
 	set8(A, res);

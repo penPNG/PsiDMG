@@ -54,7 +54,8 @@ private:
 
 	// Load
 	byte LD(reg8, reg8);		// Load standard
-	byte LDI(reg8, byte);		// Load Immediate
+	byte LDI(reg8, byte);		// Load Immediate to Register
+	byte LDMI(word, byte);		// Load Immediate to Memory
 	byte LDRM(reg8, word);		// Load to Register from Memory
 	byte LDMR(word, reg8);		// Load to Memory from Register
 
