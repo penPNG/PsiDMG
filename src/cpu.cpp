@@ -19,6 +19,11 @@ void CPU::set8(reg8 reg, byte b) { registers.reg8[reg] = b; }
 void CPU::set16(reg16 reg, word w) { registers.reg16[reg] = w; }
 void CPU::set16(reg16 reg, byte l, byte h) { registers.reg16[reg] = (l | (h << 8)); }
 
+byte CPU::getZ() { return registers.reg8[F] >> 7; }
+byte CPU::getN() { return (registers.reg8[F] & 0b01000000) >> 6; }
+byte CPU::getH() { return (registers.reg8[F] & 0b00100000) >> 5; }
+byte CPU::getC() { return (registers.reg8[F] & 0b00010000) >> 4; }
+
 void CPU::setZ(bool z) { if (z) { set8(F, flagZ); } }
 void CPU::setN(bool n) { if (n) { set8(F, flagN); } }
 void CPU::setH(bool h) { if (h) { set8(F, flagH); } }
@@ -133,6 +138,7 @@ void CPU::initInst() {
 
 // Instructions
 // ------------
+
 // Load standard
 byte CPU::LD(reg8 x, reg8 y) { 
 	printf("LDH: %d %d", x, y);
@@ -209,24 +215,31 @@ byte CPU::LD16MSP(word addr) {
 
 	ram.ram[addr] = get16(SP) & 0x00FF;
 	ram.ram[addr+1] = get16(SP) & (0xFF00 >> 8);
+	return 20;
 }
 
+// POP Stack to 16 Bit Register
 byte CPU::POP(reg16 reg) {
 	printf("POP: %d", reg);
 	
 	set16(reg, ram.ram[registers.reg16[SP]++] | (ram.ram[registers.reg16[SP]++] << 8));
+	return 12;
 }
 
+// Push 16 Bit Register to Stack
 byte CPU::PUSH(reg16 reg) {
 	printf("PUSH: %d", reg);
 
 	setRam(--registers.reg16[SP], get16(reg) & (0xFF00 >> 8));
 	setRam(--registers.reg16[SP], get16(reg) & 0x00FF);
+	return 16;
 }
 // ------------
 
 // Arithmetic
 // ----------
+
+// ADD Register to A
 byte CPU::ADD(reg8 reg) { 
 	byte a, n;
 	printf("ADD: %d %d", a = get8(A), n = get8(reg));
@@ -236,11 +249,98 @@ byte CPU::ADD(reg8 reg) {
 	setH(((a&0x0F)+(n&0x0F)) & 0x10);
 	setC(res & 0x0100);
 	set8(A, res);
+	return 4;
 }
 
-byte CPU::ADC(word op) { printf("ADC"); }
+// ADD Memory to A
+byte CPU::ADDM(word addr) {
+	byte n, a;
+	printf("ADDM: %d %d", a = get8(A), n = getRam(addr));
 
-byte CPU::ADD16(word op) { printf("ADD16"); }
+	word res = a+n;
+	setZ(res==0); setN(0);
+	setH(((a & 0x0F) + (n & 0x0F)) & 0x10);
+	setC(res & 0x0100);
+	set8(A, res);
+	return 8;
+}
+
+// ADD Immediate to A
+byte CPU::ADDI(byte n) {
+	byte a;
+	printf("ADDI: %d %d", a = get8(A), n);
+
+	word res = a+n;
+	setZ(res == 0); setN(0);
+	setH(((a & 0x0F) + (n & 0x0F)) & 0x10);
+	setC(res & 0x0100);
+	set8(A, res);
+	return 8;
+}
+
+// ADD with Carry Register to A
+byte CPU::ADC(reg8 reg) { 
+	byte a, n, c;
+	printf("ADC: %d %d %d", a = get8(A), n = get8(reg), c = getC());
+
+	word res = a+n+c;
+	setZ(res == 0); setN(0);
+	setH(((a & 0x0F) + (n & 0x0F) + c) & 0x10);
+	setC(res & 0x0100);
+	set8(A, res);
+	return 4;
+}
+
+// ADD with Carry emory to A
+byte CPU::ADCM(word addr) {
+	byte a, n, c;
+	printf("ADCM: %d %d %d", a = get8(a), n = getRam(addr), c = getC());
+
+	word res = a+n+c; 
+	setZ(res == 0); setN(0);
+	setH(((a & 0x0F) + (n & 0x0F) + c) & 0x10);
+	setC(res & 0x0100);
+	set8(A, res);
+	return 8;
+}
+
+// ADD with Carry Immediate to A
+byte CPU::ADCI(byte n) {
+	byte a, c;
+	printf("ADCM: %d %d %d", a = get8(A), n, c = getC());
+
+	word res = a + n + c;
+	setZ(res == 0); setN(0);
+	setH(((a & 0x0F) + (n & 0x0F) + c) & 0x10);
+	setC(res & 0x0100);
+	set8(A, res);
+	return 8;
+}
+
+// ADD 16 Bit Register to HL
+byte CPU::ADD16(reg16 reg) { 
+	word a, n;
+	printf("ADD16: %d %d %d", a = get16(HL), n = get16(reg)); 
+
+	unsigned int res = a + n;
+	setN(0);
+	setH((a & 0xFF) + (n & 0xFF) & 0x0100);
+	setC(res & 0x10000);
+	set16(HL, res);
+	return 8;
+}
+
+byte CPU::ADD16I(sbyte n) {
+	word a;
+	printf("ADD16: %d %d %d", a = get16(SP), n);
+
+	unsigned int res = a + n;
+	setZ(0); setN(0);
+	setH((a & 0xFF) + (n & 0xFF) & 0x0100);
+	setC(res & 0x10000);
+	set16(SP, res);
+	return 16;
+}
 
 byte CPU::SUB(word op) { printf("SUB"); }
 
