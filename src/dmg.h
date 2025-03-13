@@ -9,5 +9,5 @@ public:
 	DMG();
 
 	CPU cpu;
-	Memory memory;
+	static Memory ram;
 };

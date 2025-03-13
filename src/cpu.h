@@ -1,6 +1,8 @@
 #pragma once
 #include "ds.h"
 #include <stdio.h>
+#include "memory.h"
+#include <cstddef>
 
 // Flags
 #define FLAG_Z 0b10000000
@@ -8,21 +10,18 @@
 #define FLAG_H 0b00100000
 #define FLAG_C 0b00010000
 
-struct Registers {
-	Register regAF;
-	Register regBC;
-	Register regDE;
-	Register regHL;
-	Register regSP;	// Stack pointer
-	Register regPC;	// Program counter
-};
-
 class CPU {
 public:
-	CPU();
+	CPU(Memory&);
 
-	inline static void (*inst[256]) (word);
-	inline static void (*CBInst[256]) (word);
+	void exec(word);
+
+	//inline static void (*inst[256]) (word);
+	/*void (CPU::*CBInst[256]) (word);
+	inline static byte (*getReg[8]) ();
+	inline static word (*getReg16[6]) ();
+	inline static void (*setReg[8]) (byte);
+	inline static void (*setReg16[6]) (word);*/
 
 	// Regiseter Functions
 	// -------------------
@@ -59,78 +58,158 @@ public:
 	void setHL(byte, byte);
 	void setSP(word);
 	void setPC(word);
-	void setPCLo(byte);
-	void setPCHi(byte);
 	// -------------------
 
-private:
-	void initInst();
-
-	// Load
-	static void LD(word);
-	static void LDH(word);
-	static void LD16(word);
-	static void POP(word);
-	static void PUSH(word);
-
-	// Arithmetic
-	static void ADD(word);		// ADD Operation
-	static void ADC(word);		// ADD with Carry
-	static void ADD16(word);	// 16 bit ADD Operation
-	static void SUB(word);		// SUB Operation
-	static void SBC(word);		// SUB with Carry
-	static void AND(word);		// AND Operation
-	static void XOR(word);		// ... TODO FINISH NOTES
-	static void OR(word);
-	static void CP(word);
-	static void INC(word);
-	static void INC16(word);	// 16 bit INC Operation
-	static void DEC(word);
-	static void DEC16(word);	// 16 bit DEC operation
-	static void CPL(word);		// One's complement register A
-	static void CCF(word);		// Flip the carry flag CY
-	static void DAA(word);		// Adjust BCD of register A
-	static void SCF(word);		// Set the carry flag CY
-
-	// Control
-	static void NOP(word);		// Advance PC by one
-	static void STOP(word);		// Stop the clock... chaos ensues
-	static void HALT(word);
-	static void DI(word);		// Disable Interupts
-	static void EI(word);		// Enable Interupts
-
-	// Jump / Call
-	static void JR(word);		// Jump Relative
-	static void JP(word);		// Jump Absolute
-	static void CALL(word);		// Call
-	static void RST(word);		// Reset?
-	static void RET(word);		// Return from call
-	static void RETI(word);		// Return with interupts
-
-	// Bit Manipulation
-	static void RLCA(word);
-	static void RLA(word);
-	static void RRCA(word);
-	static void RRA(word);
-	static void PREF(word);
-
-	// CB Instructions
-	static void RLC(word);
-	static void RRC(word);
-	static void RL(word);
-	static void RR(word);
-	static void SLA(word);
-	static void SRA(word);
-	static void SWAP(word);
-	static void SRL(word);
-	static void BIT(word);
-	static void RES(word);
-	static void SET(word);
-
-	static void no(word);
+	byte getAddr(word);
+	void setAddr(word, byte);
 
 private:
 	Registers registers;
+	word PC;
+	
+	//using reg8 = byte;
+	/*using reg16 = word;
+	static constexpr reg8 A = 1, F = 0, B = 3, C = 2, D = 5, E = 4, H = 7, L = 6;
+	static constexpr reg16 AF = 0, BC = 1, DE = 2, HL = 3, SP = 4;*/
+
+	void initInst();
+
+	// Load
+	void LD(reg8, reg8);		// Load standard
+	void LDI(reg8, byte);		// Load Immediate
+	void LDRM(reg8, word);		// Load to Register from Memory
+	void LDMRu(word, reg8);		// Load to Memory from Register
+
+	void LD16(reg16, word);		// Load standard 16 Bit
+	void LD16SPHL();			// Load to SP from HL
+	void LD16HLSP(sbyte);		// Load to HL from SP + Signed Byte
+	void LD16MSP(word);			// LOAD to Memory from SP
+
+	void POP(reg16);			// POP Stack to 16 Bit Register
+	void PUSH(reg16);			// Push 16 Bit Register to Stack
+
+	// Arithmetic
+	void ADD(reg8);		// ADD Register to A
+	void ADDM(word);	// ADD Memory to A
+	void ADDI(byte);	// ADD Immediate to A
+
+	void ADC(reg8);		// ADD with Carry Register to A
+	void ADCM(word);	// ADD with Carry emory to A
+	void ADCI(byte);	// ADD with Carry Immediate to A
+
+	void ADD16(reg16);	// ADD 16 Bit Register to HL
+	void ADD16I(sbyte);	// ADD Signed Byte to SP
+
+	void SUB(reg8);		// SUB Register from A
+	void SUBM(word);	// SUB Memory from A
+	void SUBI(byte);	// SUB Immediate from A
+
+	void SBC(reg8);		// SUB with Carry Register from A
+	void SBCM(word);	// SUB with Carry Memory from A
+	void SBCI(byte);	// SUB with Carry Immediate from A
+
+	void AND(reg8);		// AND Register with A
+	void ANDM(word);	// AND Memory with A
+	void ANDI(byte);	// AND Immediate with A
+
+	void XOR(reg8);		// XOR Register with A
+	void XORM(word);	// XOR Memory with A
+	void XORI(byte);	// XOR Immediate with A
+
+	void OR(reg8);		// OR Register with A
+	void ORM(word);		// OR Memory with A
+	void ORI(byte);		// OR Immediate with A
+
+	void CP(reg8);		// Compare Register with A for equality
+	void CPM(word);		// Compare Memory with A for equality
+	void CPI(byte);		// Compare Immediate with A for equality
+
+	void INC(reg8);		// Increment Register
+	void INCM(word);	// Increment Memory
+	void INC16(reg16);	// Increment 16 Bit Register
+
+	void DEC(reg8);		// Decrement Register
+	void DECM(word);	// Decrement Memory
+	void DEC16(reg16);	// Decrement 16 Bit Register
+
+	void CPL(word);		// One's complement Register A
+	void CCF(word);		// Flip Carry Flag
+	void DAA(word);		// Adjust BCD of register A
+	void SCF(word);		// Set Carry Flag
+
+	// Control
+	void NOP(word);		// Advance PC by one
+	void STOP(word);	// Stop the clock... chaos ensues
+	void HALT(word);	// A special tool we're saving for later
+	void DI(word);		// Disable Interupts
+	void EI(word);		// Enable Interupts
+
+	// Jump / Call
+	void JR(sbyte);			// Jump the value of the Signed Byte
+	void JRS(flag, sbyte);	// Jump the value of the Signed Byte if Flag is set
+	void JRN(flag, sbyte);	// Jump the value of the Signed Byte if Flag is not set
+
+	void JP(word);			// Jump to given Address
+	void JPHL();			// Jump to HL
+	void JPS(flag, word);	// Jump to given Address if Flag is set
+	void JPN(flag, word);	// Jump to given Address if Flag is not set
+
+	void CALL(word);		// Call given Address
+	void CLLS(flag, word);	// Call given Address if Flag is set
+	void CLLN(flag, word);	// Call given Address if Flag is not set
+
+	void RST(byte);			// Push PC to Stack, Jump to $0000 + Byte
+
+	void RET();				// Pop stack to PC
+	void RTS(flag);			// Pop stack to PC if Flag is set
+	void RTN(flag);			// Pop stack to PC if FLag is not set
+	void RETI(word);		// Return with interupts
+
+	// Bit Manipulation
+	void RLCA();		// Rotate Register A Left with Carry
+	void RLA();			// Rotate Register A Left
+	void RRCA();		// Rotate Register A Right with Carry
+	void RRA();			// Rotate Register A Right
+	void PREF(byte);	// CB Prefix
+
+	// CB Instructions
+	void RLC(reg8);			// Rotate Register Left with Carry
+	void RLCM(word);		// Rotate Memory Left with Carry
+	void RRC(reg8);			// Rotate Register Right with Carry
+	void RRCM(word);		// Rotate Memory Right with Carry
+
+	void RL(reg8);			// Rotate Register Left
+	void RLM(word);			// Rotate Memory Left
+
+	void RR(reg8);			// Rotate Register Right
+	void RRM(word);			// Rotate Memory Right
+
+	void SLA(reg8);			// Shift Register Left (reset bit 0)
+	void SLAM(word);		// Shift Memory Left (reset bit 0)
+
+	void SRA(reg8);			// Shift Register Right
+	void SRAM(word);		// Shift Memory Right
+
+	void SWAP(reg8);		// Swap Hi and Lo Bits of Register
+	void SWPM(word);		// Swap Hi and Lo Bits of Memory
+
+	void SRL(reg8);			// Shift Register Right (reset bit 0)
+	void SRLM(word);		// Shift Memory Right (reset bit 0)
+
+	void BIT(byte, reg8);	// Copy Bit from Register to Z Flag
+	void BITM(byte, word);	// Copy Bit from Memory to Z Flag
+
+	void RES(byte, reg8);	// Reset Bit in Register
+	void RES(byte, word);	// Reset Bit in Memory
+
+	void SET(byte, reg8);	// Set Bit in Register
+	void SETM(byte, word);	// Set Bit in Memory
+
+	void no(word);
+
+private:
+
+	Memory ram;
 	word opc;
 
 };
