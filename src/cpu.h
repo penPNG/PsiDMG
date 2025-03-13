@@ -25,43 +25,21 @@ public:
 
 	// Regiseter Functions
 	// -------------------
-	byte getA();
-	byte getF();
-	word getAF();
-	byte getB();
-	byte getC();
-	word getBC();
-	byte getD();
-	byte getE();
-	word getDE();
-	byte getH();
-	byte getL();
-	word getHL();
-	word getSP();
-	word getPC();
+	byte get8(reg8);
+	word get16(reg16);
 
-	void setA(byte);
-	void setF(byte);
-	void setAF(word);
-	void setAF(byte, byte);
-	void setB(byte);
-	void setC(byte);
-	void setBC(word);
-	void setBC(byte, byte);
-	void setD(byte);
-	void setE(byte);
-	void setDE(word);
-	void setDE(byte, byte);
-	void setH(byte);
-	void setL(byte);
-	void setHL(word);
-	void setHL(byte, byte);
-	void setSP(word);
-	void setPC(word);
+	void set8(reg8, byte);
+	void set16(reg16, word);
+	void set16(reg16, byte, byte);
+
+	void setZ(bool);
+	void setN(bool);
+	void setH(bool);
+	void setC(bool);
 	// -------------------
 
-	byte getAddr(word);
-	void setAddr(word, byte);
+	byte getRam(word);
+	void setRam(word, byte);
 
 private:
 	Registers registers;
@@ -78,13 +56,13 @@ private:
 	void LD(reg8, reg8);		// Load standard
 	void LDI(reg8, byte);		// Load Immediate
 	void LDRM(reg8, word);		// Load to Register from Memory
-	void LDMRu(word, reg8);		// Load to Memory from Register
+	void LDMR(word, reg8);		// Load to Memory from Register
 
-	void LD16(reg16, word);		// Load standard 16 Bit
+	void LD16(reg16, word);		// Load 16 Bit Immediate
 	void LD16SPHL();			// Load to SP from HL
 	void LD16HLSP(sbyte);		// Load to HL from SP + Signed Byte
 	void LD16MSP(word);			// LOAD to Memory from SP
-
+	
 	void POP(reg16);			// POP Stack to 16 Bit Register
 	void PUSH(reg16);			// Push 16 Bit Register to Stack
 
@@ -209,7 +187,7 @@ private:
 
 private:
 
-	Memory ram;
+	Memory& ram;
 	word opc;
 
 };

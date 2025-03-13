@@ -18,7 +18,9 @@ enum reg8 {
 	E,
 	D,
 	L,
-	H
+	H,
+	P,
+	S
 };
 
 enum reg16 {

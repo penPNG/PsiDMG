@@ -1,6 +1,6 @@
 #include "cpu.h"
 
-CPU::CPU(Memory& ram) {
+CPU::CPU(Memory& _ram) : ram(_ram) {
 	initInst();
 
 	registers.reg8[A] = 0x01; registers.reg8[F] = FLAG_Z;
@@ -12,39 +12,17 @@ CPU::CPU(Memory& ram) {
 
 // Reigster Functions
 // ------------------
-byte CPU::getA() { return registers.reg8[A]; }
-byte CPU::getF() { return registers.reg8[F]; }
-word CPU::getAF() { return registers.reg16[AF]; }
-byte CPU::getB() { return registers.reg8[B]; }
-byte CPU::getC() { return registers.reg8[C]; }
-word CPU::getBC() { return registers.reg16[BC]; }
-byte CPU::getD() { return registers.reg8[D]; }
-byte CPU::getE() { return registers.reg8[E]; }
-word CPU::getDE() { return registers.reg16[DE]; }
-byte CPU::getH() { return registers.reg8[H]; }
-byte CPU::getL() { return registers.reg8[L]; }
-word CPU::getHL() { return registers.reg16[HL]; }
-word CPU::getSP() { return registers.reg16[SP]; }
-word CPU::getPC() { return PC; }
+byte CPU::get8(reg8 reg) { return registers.reg8[reg]; }
+word CPU::get16(reg16 reg) {return registers.reg16[reg]; }
 
-void CPU::setA(byte d) { registers.reg8[A] = d; }
-void CPU::setF(byte d) { d &= 0xF0; registers.reg8[F] &= d; } // Set Flags
-void CPU::setAF(word d) { d &= 0xFFF0; registers.reg16[AF] = d; }
-void CPU::setAF(byte l, byte h) { h &= 0xF0; registers.reg16[AF] = (h | (l << 8)); }
-void CPU::setB(byte d) { registers.reg8[B] = d; }
-void CPU::setC(byte d) { registers.reg8[C] = d; }
-void CPU::setBC(word d) { registers.reg16[BC] = d; }
-void CPU::setBC(byte l, byte h) { registers.reg16[BC] = (h | (l << 8)); }
-void CPU::setD(byte d) { registers.reg8[D] = d; }
-void CPU::setE(byte d) { registers.reg8[E] = d; }
-void CPU::setDE(word d) { registers.reg16[DE] = d; }
-void CPU::setDE(byte l, byte h) { registers.reg16[DE] = (h | (l << 8)); }
-void CPU::setH(byte d) { registers.reg8[H] = d; }
-void CPU::setL(byte d) { registers.reg8[L] = d; }
-void CPU::setHL(word d) { registers.reg16[HL] = d; }
-void CPU::setHL(byte l, byte h) { registers.reg16[HL] = (h | (l << 8)); }
-void CPU::setSP(word d) { registers.reg16[SP] = d; }
-void CPU::setPC(word d) { PC = d; }	// Set Program Counter
+void CPU::set8(reg8 reg, byte b) { registers.reg8[reg] = b; }
+void CPU::set16(reg16 reg, word w) { registers.reg16[reg] = w; }
+void CPU::set16(reg16 reg, byte l, byte h) { registers.reg16[reg] = (l | (h << 8)); }
+
+void CPU::setZ(bool z) { if (z) { set8(F, flagZ); } }
+void CPU::setN(bool n) { if (n) { set8(F, flagN); } }
+void CPU::setH(bool h) { if (h) { set8(F, flagH); } }
+void CPU::setC(bool c) { if (c) { set8(F, flagC); } }
 // -------------------
 
 void CPU::exec(word op) {
@@ -59,7 +37,7 @@ void CPU::exec(word op) {
 
 		// Jumps / Calls
 		case 0x18: case 0x20: case 0x28: case 0x30: case 0x38: { JR(op); return; }
-		case 0xC0: case 0xC8: case 0xC9: case 0xD0: case 0xD8: { RET(op); return; }
+		case 0xC0: case 0xC8: case 0xC9: case 0xD0: case 0xD8: { RET(); return; }
 		case 0xC2: case 0xC3: case 0xCA: case 0xD2: case 0xDA: { JP(op); return; }
 	}
 }
@@ -155,52 +133,81 @@ void CPU::initInst() {
 
 // Instructions
 // ------------
-
-// Load
-void CPU::LD(word op) {
-	if (op == 0xFFFF) { printf("LD"); return; }	// testing code
-
-	byte set = (op & 0xF000) >> 8;
-	byte get = (op & 0x0F00) >> 8;
-	byte data = (op & 0x00FF);
-
-	/*switch (set) {
-		case 0x40: {
-			if (set < 0x8) { if (set != 0x6) { setB(getReg[get]()); return; } setB(getAddr(getHL())); return; }
-			else { if (set != 0xE) { setC(getReg[get]()); return; } setC(getAddr(getHL())); return; }
-		}
-		case 0x50: {
-			if (set < 0x8) { if (set != 0x6) { setD(getReg[get]()); return; } setD(getAddr(getHL())); return; }
-			else { if (set != 0xE) { setE(getReg[get]()); return; } setE(getAddr(getHL())); return; }
-		}
-		case 0x60: {
-			if (set < 0x8) { if (set != 0x6) { setH(getReg[get]()); return; } setH(getAddr(getHL())); return; }
-			else { if (set != 0xE) { setL(getReg[get]()); return; } setL(getAddr(getHL())); return; }
-		}
-		case 0x70: {
-			if (set < 0x8) { if (set != 0x6) { setAddr(getHL(), data); } }
-			else { if (set != 0xE) { setA(getReg[get]()); return; } setA(getAddr(getHL())); return; }
-		}
-	}
-	switch (get) {
-		case 0x06: printf("0x06: %X ", data); setB(op & 0x00FF); return;
-	}*/
-}
-
 void CPU::LD(reg8 x, reg8 y) { 
 	printf("LDH: %d %d", x, y);
 
-
+	set8(x, get8(y));
 }
 
-void CPU::LD16(word op) { printf("LD16"); }
+void CPU::LDI(reg8 reg, byte b) { 
+	printf("LDI: %d %d", reg, b); 
 
-void CPU::POP(word op) { printf("POP"); }
+	set8(reg, b);
+}
 
-void CPU::PUSH(word op) { printf("PUSH"); }
+void CPU::LDRM(reg8 reg, word addr) {
+	printf("LDRM: %d %d", reg, addr);
+
+	set8(reg, ram.ram[addr]);
+}
+
+void CPU::LDMR(word addr, reg8 reg) {
+	printf("LDMR: %d %d", addr, reg);
+
+	ram.ram[addr] = get8(reg);
+}
+
+void CPU::LD16(reg16 reg, word w) {
+	printf("LD16: %d %d", reg, w);
+
+	set16(reg, w);
+}
+
+void CPU::LD16SPHL() {
+	printf("LD16SPHL: %d %d", get16(SP), get16(HL));
+
+	set16(SP, get16(HL));
+}
+
+void CPU::LD16HLSP(sbyte sb) {
+	printf("LD16HLSP: %d %d %d", get16(HL), get16(SP), sb);
+
+	set16(HL, get16(SP)+sb);
+}
+
+void CPU::LD16MSP(word addr) {
+	printf("LD16HLSP: %d %d", addr, get16(SP));
+
+	ram.ram[addr] = get16(SP) & 0x00FF;
+	ram.ram[addr+1] = get16(SP) & (0xFF00 >> 8);
+}
+
+void CPU::POP(reg16 reg) {
+	printf("POP: %d", reg);
+	
+	set16(reg, ram.ram[registers.reg16[SP]++] | (ram.ram[registers.reg16[SP]++] << 8));
+}
+
+void CPU::PUSH(reg16 reg) {
+	printf("PUSH: %d", reg);
+
+	setRam(--registers.reg16[SP], get16(reg) & (0xFF00 >> 8));
+	setRam(--registers.reg16[SP], get16(reg) & 0x00FF);
+}
+// ------------
 
 // Arithmetic
-void CPU::ADD(word op) { printf("ADD"); }
+// ----------
+void CPU::ADD(reg8 reg) { 
+	byte a, n;
+	printf("ADD: %d %d", a = get8(A), n = get8(reg));
+	word res = a+n;
+	
+	setZ(res==0); setN(false);
+	setH(((a&0x0F)+(n&0x0F)) & 0x10);
+	setC(res & 0x0100);
+	set8(A, res);
+}
 
 void CPU::ADC(word op) { printf("ADC"); }
 
@@ -233,8 +240,10 @@ void CPU::CCF(word op) { printf("CCF"); }
 void CPU::DAA(word op) { printf("DAA"); }
 
 void CPU::SCF(word op) { printf("SCF"); }
+// ----------
 
 // Control
+// -------
 void CPU::NOP(word op) { printf("NOP"); }
 
 void CPU::STOP(word op) { printf("STOP"); }
@@ -249,8 +258,10 @@ void CPU::PREF(word op) {
 void CPU::DI(word op) { printf("DI"); }
 
 void CPU::EI(word op) { printf("EI"); }
+// -------
 
 // Jump / Call
+// -----------
 void CPU::JR(word op) { printf("JR"); }
 
 void CPU::JP(word op) { printf("JP"); }
@@ -300,10 +311,10 @@ void CPU::SET(word op) { printf("SET"); }
 // ------------
 
 // TODO make safer functions!
-byte CPU::getAddr(word addr) {
+byte CPU::getRam(word addr) {
 	return ram.ram[addr];
 }
 
-void CPU::setAddr(word addr, byte data) {
+void CPU::setRam(word addr, byte data) {
 	ram.ram[addr] = data;
 }
