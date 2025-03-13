@@ -32,6 +32,11 @@ public:
 	void set16(reg16, word);
 	void set16(reg16, byte, byte);
 
+	byte getZ();
+	byte getN();
+	byte getH();
+	byte getC();
+
 	void setZ(bool);
 	void setN(bool);
 	void setH(bool);
