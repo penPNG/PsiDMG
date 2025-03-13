@@ -53,135 +53,135 @@ private:
 	void initInst();
 
 	// Load
-	void LD(reg8, reg8);		// Load standard
-	void LDI(reg8, byte);		// Load Immediate
-	void LDRM(reg8, word);		// Load to Register from Memory
-	void LDMR(word, reg8);		// Load to Memory from Register
+	byte LD(reg8, reg8);		// Load standard
+	byte LDI(reg8, byte);		// Load Immediate
+	byte LDRM(reg8, word);		// Load to Register from Memory
+	byte LDMR(word, reg8);		// Load to Memory from Register
 
-	void LD16(reg16, word);		// Load 16 Bit Immediate
-	void LD16SPHL();			// Load to SP from HL
-	void LD16HLSP(sbyte);		// Load to HL from SP + Signed Byte
-	void LD16MSP(word);			// LOAD to Memory from SP
+	byte LD16(reg16, word);		// Load 16 Bit Immediate
+	byte LD16SPHL();			// Load to SP from HL
+	byte LD16HLSP(sbyte);		// Load to HL from SP + Signed Byte
+	byte LD16MSP(word);			// LOAD to Memory from SP
 	
-	void POP(reg16);			// POP Stack to 16 Bit Register
-	void PUSH(reg16);			// Push 16 Bit Register to Stack
+	byte POP(reg16);			// POP Stack to 16 Bit Register
+	byte PUSH(reg16);			// Push 16 Bit Register to Stack
 
 	// Arithmetic
-	void ADD(reg8);		// ADD Register to A
-	void ADDM(word);	// ADD Memory to A
-	void ADDI(byte);	// ADD Immediate to A
+	byte ADD(reg8);		// ADD Register to A
+	byte ADDM(word);	// ADD Memory to A
+	byte ADDI(byte);	// ADD Immediate to A
 
-	void ADC(reg8);		// ADD with Carry Register to A
-	void ADCM(word);	// ADD with Carry emory to A
-	void ADCI(byte);	// ADD with Carry Immediate to A
+	byte ADC(reg8);		// ADD with Carry Register to A
+	byte ADCM(word);	// ADD with Carry emory to A
+	byte ADCI(byte);	// ADD with Carry Immediate to A
 
-	void ADD16(reg16);	// ADD 16 Bit Register to HL
-	void ADD16I(sbyte);	// ADD Signed Byte to SP
+	byte ADD16(reg16);	// ADD 16 Bit Register to HL
+	byte ADD16I(sbyte);	// ADD Signed Byte to SP
 
-	void SUB(reg8);		// SUB Register from A
-	void SUBM(word);	// SUB Memory from A
-	void SUBI(byte);	// SUB Immediate from A
+	byte SUB(reg8);		// SUB Register from A
+	byte SUBM(word);	// SUB Memory from A
+	byte SUBI(byte);	// SUB Immediate from A
 
-	void SBC(reg8);		// SUB with Carry Register from A
-	void SBCM(word);	// SUB with Carry Memory from A
-	void SBCI(byte);	// SUB with Carry Immediate from A
+	byte SBC(reg8);		// SUB with Carry Register from A
+	byte SBCM(word);	// SUB with Carry Memory from A
+	byte SBCI(byte);	// SUB with Carry Immediate from A
 
-	void AND(reg8);		// AND Register with A
-	void ANDM(word);	// AND Memory with A
-	void ANDI(byte);	// AND Immediate with A
+	byte AND(reg8);		// AND Register with A
+	byte ANDM(word);	// AND Memory with A
+	byte ANDI(byte);	// AND Immediate with A
 
-	void XOR(reg8);		// XOR Register with A
-	void XORM(word);	// XOR Memory with A
-	void XORI(byte);	// XOR Immediate with A
+	byte XOR(reg8);		// XOR Register with A
+	byte XORM(word);	// XOR Memory with A
+	byte XORI(byte);	// XOR Immediate with A
 
-	void OR(reg8);		// OR Register with A
-	void ORM(word);		// OR Memory with A
-	void ORI(byte);		// OR Immediate with A
+	byte OR(reg8);		// OR Register with A
+	byte ORM(word);		// OR Memory with A
+	byte ORI(byte);		// OR Immediate with A
 
-	void CP(reg8);		// Compare Register with A for equality
-	void CPM(word);		// Compare Memory with A for equality
-	void CPI(byte);		// Compare Immediate with A for equality
+	byte CP(reg8);		// Compare Register with A for equality
+	byte CPM(word);		// Compare Memory with A for equality
+	byte CPI(byte);		// Compare Immediate with A for equality
 
-	void INC(reg8);		// Increment Register
-	void INCM(word);	// Increment Memory
-	void INC16(reg16);	// Increment 16 Bit Register
+	byte INC(reg8);		// Increment Register
+	byte INCM(word);	// Increment Memory
+	byte INC16(reg16);	// Increment 16 Bit Register
 
-	void DEC(reg8);		// Decrement Register
-	void DECM(word);	// Decrement Memory
-	void DEC16(reg16);	// Decrement 16 Bit Register
+	byte DEC(reg8);		// Decrement Register
+	byte DECM(word);	// Decrement Memory
+	byte DEC16(reg16);	// Decrement 16 Bit Register
 
-	void CPL(word);		// One's complement Register A
-	void CCF(word);		// Flip Carry Flag
-	void DAA(word);		// Adjust BCD of register A
-	void SCF(word);		// Set Carry Flag
+	byte CPL(word);		// One's complement Register A
+	byte CCF(word);		// Flip Carry Flag
+	byte DAA(word);		// Adjust BCD of register A
+	byte SCF(word);		// Set Carry Flag
 
 	// Control
-	void NOP(word);		// Advance PC by one
-	void STOP(word);	// Stop the clock... chaos ensues
-	void HALT(word);	// A special tool we're saving for later
-	void DI(word);		// Disable Interupts
-	void EI(word);		// Enable Interupts
+	byte NOP(word);		// Advance PC by one
+	byte STOP(word);	// Stop the clock... chaos ensues
+	byte HALT(word);	// A special tool we're saving for later
+	byte DI(word);		// Disable Interupts
+	byte EI(word);		// Enable Interupts
 
 	// Jump / Call
-	void JR(sbyte);			// Jump the value of the Signed Byte
-	void JRS(flag, sbyte);	// Jump the value of the Signed Byte if Flag is set
-	void JRN(flag, sbyte);	// Jump the value of the Signed Byte if Flag is not set
+	byte JR(sbyte);			// Jump the value of the Signed Byte
+	byte JRS(flag, sbyte);	// Jump the value of the Signed Byte if Flag is set
+	byte JRN(flag, sbyte);	// Jump the value of the Signed Byte if Flag is not set
 
-	void JP(word);			// Jump to given Address
-	void JPHL();			// Jump to HL
-	void JPS(flag, word);	// Jump to given Address if Flag is set
-	void JPN(flag, word);	// Jump to given Address if Flag is not set
+	byte JP(word);			// Jump to given Address
+	byte JPHL();			// Jump to HL
+	byte JPS(flag, word);	// Jump to given Address if Flag is set
+	byte JPN(flag, word);	// Jump to given Address if Flag is not set
 
-	void CALL(word);		// Call given Address
-	void CLLS(flag, word);	// Call given Address if Flag is set
-	void CLLN(flag, word);	// Call given Address if Flag is not set
+	byte CALL(word);		// Call given Address
+	byte CLLS(flag, word);	// Call given Address if Flag is set
+	byte CLLN(flag, word);	// Call given Address if Flag is not set
 
-	void RST(byte);			// Push PC to Stack, Jump to $0000 + Byte
+	byte RST(byte);			// Push PC to Stack, Jump to $0000 + Byte
 
-	void RET();				// Pop stack to PC
-	void RTS(flag);			// Pop stack to PC if Flag is set
-	void RTN(flag);			// Pop stack to PC if FLag is not set
-	void RETI(word);		// Return with interupts
+	byte RET();				// Pop stack to PC
+	byte RTS(flag);			// Pop stack to PC if Flag is set
+	byte RTN(flag);			// Pop stack to PC if FLag is not set
+	byte RETI(word);		// Return with interupts
 
 	// Bit Manipulation
-	void RLCA();		// Rotate Register A Left with Carry
-	void RLA();			// Rotate Register A Left
-	void RRCA();		// Rotate Register A Right with Carry
-	void RRA();			// Rotate Register A Right
-	void PREF(byte);	// CB Prefix
+	byte RLCA();		// Rotate Register A Left with Carry
+	byte RLA();			// Rotate Register A Left
+	byte RRCA();		// Rotate Register A Right with Carry
+	byte RRA();			// Rotate Register A Right
+	byte PREF(byte);	// CB Prefix
 
 	// CB Instructions
-	void RLC(reg8);			// Rotate Register Left with Carry
-	void RLCM(word);		// Rotate Memory Left with Carry
-	void RRC(reg8);			// Rotate Register Right with Carry
-	void RRCM(word);		// Rotate Memory Right with Carry
+	byte RLC(reg8);			// Rotate Register Left with Carry
+	byte RLCM(word);		// Rotate Memory Left with Carry
+	byte RRC(reg8);			// Rotate Register Right with Carry
+	byte RRCM(word);		// Rotate Memory Right with Carry
 
-	void RL(reg8);			// Rotate Register Left
-	void RLM(word);			// Rotate Memory Left
+	byte RL(reg8);			// Rotate Register Left
+	byte RLM(word);			// Rotate Memory Left
 
-	void RR(reg8);			// Rotate Register Right
-	void RRM(word);			// Rotate Memory Right
+	byte RR(reg8);			// Rotate Register Right
+	byte RRM(word);			// Rotate Memory Right
 
-	void SLA(reg8);			// Shift Register Left (reset bit 0)
-	void SLAM(word);		// Shift Memory Left (reset bit 0)
+	byte SLA(reg8);			// Shift Register Left (reset bit 0)
+	byte SLAM(word);		// Shift Memory Left (reset bit 0)
 
-	void SRA(reg8);			// Shift Register Right
-	void SRAM(word);		// Shift Memory Right
+	byte SRA(reg8);			// Shift Register Right
+	byte SRAM(word);		// Shift Memory Right
 
-	void SWAP(reg8);		// Swap Hi and Lo Bits of Register
-	void SWPM(word);		// Swap Hi and Lo Bits of Memory
+	byte SWAP(reg8);		// Swap Hi and Lo Bits of Register
+	byte SWPM(word);		// Swap Hi and Lo Bits of Memory
 
-	void SRL(reg8);			// Shift Register Right (reset bit 0)
-	void SRLM(word);		// Shift Memory Right (reset bit 0)
+	byte SRL(reg8);			// Shift Register Right (reset bit 0)
+	byte SRLM(word);		// Shift Memory Right (reset bit 0)
 
-	void BIT(byte, reg8);	// Copy Bit from Register to Z Flag
-	void BITM(byte, word);	// Copy Bit from Memory to Z Flag
+	byte BIT(byte, reg8);	// Copy Bit from Register to Z Flag
+	byte BITM(byte, word);	// Copy Bit from Memory to Z Flag
 
-	void RES(byte, reg8);	// Reset Bit in Register
-	void RES(byte, word);	// Reset Bit in Memory
+	byte RES(byte, reg8);	// Reset Bit in Register
+	byte RES(byte, word);	// Reset Bit in Memory
 
-	void SET(byte, reg8);	// Set Bit in Register
-	void SETM(byte, word);	// Set Bit in Memory
+	byte SET(byte, reg8);	// Set Bit in Register
+	byte SETM(byte, word);	// Set Bit in Memory
 
 	void no(word);
 

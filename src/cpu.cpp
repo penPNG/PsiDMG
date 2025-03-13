@@ -133,62 +133,62 @@ void CPU::initInst() {
 
 // Instructions
 // ------------
-void CPU::LD(reg8 x, reg8 y) { 
+byte CPU::LD(reg8 x, reg8 y) { 
 	printf("LDH: %d %d", x, y);
 
 	set8(x, get8(y));
 }
 
-void CPU::LDI(reg8 reg, byte b) { 
+byte CPU::LDI(reg8 reg, byte b) { 
 	printf("LDI: %d %d", reg, b); 
 
 	set8(reg, b);
 }
 
-void CPU::LDRM(reg8 reg, word addr) {
+byte CPU::LDRM(reg8 reg, word addr) {
 	printf("LDRM: %d %d", reg, addr);
 
 	set8(reg, ram.ram[addr]);
 }
 
-void CPU::LDMR(word addr, reg8 reg) {
+byte CPU::LDMR(word addr, reg8 reg) {
 	printf("LDMR: %d %d", addr, reg);
 
 	ram.ram[addr] = get8(reg);
 }
 
-void CPU::LD16(reg16 reg, word w) {
+byte CPU::LD16(reg16 reg, word w) {
 	printf("LD16: %d %d", reg, w);
 
 	set16(reg, w);
 }
 
-void CPU::LD16SPHL() {
+byte CPU::LD16SPHL() {
 	printf("LD16SPHL: %d %d", get16(SP), get16(HL));
 
 	set16(SP, get16(HL));
 }
 
-void CPU::LD16HLSP(sbyte sb) {
+byte CPU::LD16HLSP(sbyte sb) {
 	printf("LD16HLSP: %d %d %d", get16(HL), get16(SP), sb);
 
 	set16(HL, get16(SP)+sb);
 }
 
-void CPU::LD16MSP(word addr) {
+byte CPU::LD16MSP(word addr) {
 	printf("LD16HLSP: %d %d", addr, get16(SP));
 
 	ram.ram[addr] = get16(SP) & 0x00FF;
 	ram.ram[addr+1] = get16(SP) & (0xFF00 >> 8);
 }
 
-void CPU::POP(reg16 reg) {
+byte CPU::POP(reg16 reg) {
 	printf("POP: %d", reg);
 	
 	set16(reg, ram.ram[registers.reg16[SP]++] | (ram.ram[registers.reg16[SP]++] << 8));
 }
 
-void CPU::PUSH(reg16 reg) {
+byte CPU::PUSH(reg16 reg) {
 	printf("PUSH: %d", reg);
 
 	setRam(--registers.reg16[SP], get16(reg) & (0xFF00 >> 8));
@@ -198,7 +198,7 @@ void CPU::PUSH(reg16 reg) {
 
 // Arithmetic
 // ----------
-void CPU::ADD(reg8 reg) { 
+byte CPU::ADD(reg8 reg) { 
 	byte a, n;
 	printf("ADD: %d %d", a = get8(A), n = get8(reg));
 	word res = a+n;
@@ -209,104 +209,104 @@ void CPU::ADD(reg8 reg) {
 	set8(A, res);
 }
 
-void CPU::ADC(word op) { printf("ADC"); }
+byte CPU::ADC(word op) { printf("ADC"); }
 
-void CPU::ADD16(word op) { printf("ADD16"); }
+byte CPU::ADD16(word op) { printf("ADD16"); }
 
-void CPU::SUB(word op) { printf("SUB"); }
+byte CPU::SUB(word op) { printf("SUB"); }
 
-void CPU::SBC(word op) { printf("SBC"); }
+byte CPU::SBC(word op) { printf("SBC"); }
 
-void CPU::AND(word op) { printf("AND"); }
+byte CPU::AND(word op) { printf("AND"); }
 
-void CPU::XOR(word op) { printf("XOR"); }
+byte CPU::XOR(word op) { printf("XOR"); }
 
-void CPU::OR(word op) { printf("OR"); }
+byte CPU::OR(word op) { printf("OR"); }
 
-void CPU::CP(word op) { printf("CP"); }
+byte CPU::CP(word op) { printf("CP"); }
 
-void CPU::INC(word op) { printf("INC"); }
+byte CPU::INC(word op) { printf("INC"); }
 
-void CPU::INC16(word op) { printf("INC16"); }
+byte CPU::INC16(word op) { printf("INC16"); }
 
-void CPU::DEC(word op) { printf("DEC"); }
+byte CPU::DEC(word op) { printf("DEC"); }
 
-void CPU::DEC16(word op) { printf("DEC16"); }
+byte CPU::DEC16(word op) { printf("DEC16"); }
 
-void CPU::CPL(word op) { printf("CPL"); }
+byte CPU::CPL(word op) { printf("CPL"); }
 
-void CPU::CCF(word op) { printf("CCF"); }
+byte CPU::CCF(word op) { printf("CCF"); }
 
-void CPU::DAA(word op) { printf("DAA"); }
+byte CPU::DAA(word op) { printf("DAA"); }
 
-void CPU::SCF(word op) { printf("SCF"); }
+byte CPU::SCF(word op) { printf("SCF"); }
 // ----------
 
 // Control
 // -------
-void CPU::NOP(word op) { printf("NOP"); }
+byte CPU::NOP(word op) { printf("NOP"); }
 
-void CPU::STOP(word op) { printf("STOP"); }
+byte CPU::STOP(word op) { printf("STOP"); }
 
-void CPU::HALT(word op) { printf("HALT"); }
+byte CPU::HALT(word op) { printf("HALT"); }
 
-void CPU::PREF(word op) {
+byte CPU::PREF(word op) {
 	if (op == 0x3244) { printf("PREF"); return; }
 	//CBInst[op & 0x00FF](op);
 }
 
-void CPU::DI(word op) { printf("DI"); }
+byte CPU::DI(word op) { printf("DI"); }
 
-void CPU::EI(word op) { printf("EI"); }
+byte CPU::EI(word op) { printf("EI"); }
 // -------
 
 // Jump / Call
 // -----------
-void CPU::JR(word op) { printf("JR"); }
+byte CPU::JR(word op) { printf("JR"); }
 
-void CPU::JP(word op) { printf("JP"); }
+byte CPU::JP(word op) { printf("JP"); }
 
-void CPU::CALL(word op) { printf("CALL"); }
+byte CPU::CALL(word op) { printf("CALL"); }
 
-void CPU::RST(word op) { printf("RST"); }
+byte CPU::RST(word op) { printf("RST"); }
 
-void CPU::RET(word op) { printf("RET"); }
+byte CPU::RET(word op) { printf("RET"); }
 
-void CPU::RETI(word op) { printf("RETI"); }
+byte CPU::RETI(word op) { printf("RETI"); }
 
-void CPU::no(word op) { printf("NOP"); }
+byte CPU::no(word op) { printf("NOP"); }
 
 //Bit Manipulation
-void CPU::RLCA(word op) { printf("RLCA"); }
+byte CPU::RLCA(word op) { printf("RLCA"); }
 
-void CPU::RLA(word op) { printf("RLA"); }
+byte CPU::RLA(word op) { printf("RLA"); }
 
-void CPU::RRCA(word op) {printf("RRCA"); }
+byte CPU::RRCA(word op) {printf("RRCA"); }
 
-void CPU::RRA(word op) {printf("RRA"); }
+byte CPU::RRA(word op) {printf("RRA"); }
 
 // CB Instructions
-void CPU::RLC(word op) { printf("RLC"); }
+byte CPU::RLC(word op) { printf("RLC"); }
 
-void CPU::RRC(word op) { printf("RRC"); }
+byte CPU::RRC(word op) { printf("RRC"); }
 
-void CPU::RL(word op) { printf("RL"); }
+byte CPU::RL(word op) { printf("RL"); }
 
-void CPU::RR(word op) { printf("RR"); }
+byte CPU::RR(word op) { printf("RR"); }
 
-void CPU::SLA(word op) { printf("SLA"); }
+byte CPU::SLA(word op) { printf("SLA"); }
 
-void CPU::SRA(word op) { printf("SRA"); }
+byte CPU::SRA(word op) { printf("SRA"); }
 
-void CPU::SWAP(word op) { printf("SWAP"); }
+byte CPU::SWAP(word op) { printf("SWAP"); }
 
-void CPU::SRL(word op) { printf("SRL"); }
+byte CPU::SRL(word op) { printf("SRL"); }
 
-void CPU::BIT(word op) { printf("BIT"); }
+byte CPU::BIT(word op) { printf("BIT"); }
 
-void CPU::RES(word op) { printf("RES"); }
+byte CPU::RES(word op) { printf("RES"); }
 
-void CPU::SET(word op) { printf("SET"); }
+byte CPU::SET(word op) { printf("SET"); }
 
 // ------------
 
