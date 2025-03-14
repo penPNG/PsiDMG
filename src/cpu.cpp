@@ -627,13 +627,46 @@ byte CPU::DEC16(reg16 reg) {
 	return 8;
 }
 
-byte CPU::CPL(word op) { printf("CPL"); }
+// One's complement Register A
+byte CPU::CPL() {
+	byte a;
+	printf("CPL: %d", a = get8(A)); 
 
-byte CPU::CCF(word op) { printf("CCF"); }
+	setN(1); setH(1);
+	set8(A, ~a);
+	return 4;
+}
 
-byte CPU::DAA(word op) { printf("DAA"); }
+// Flip Carry Flag
+byte CPU::CCF() { 
+	byte c;
+	printf("CCF: %d", c = getC()); 
 
-byte CPU::SCF(word op) { printf("SCF"); }
+	setC(!c);
+	return 4;
+}
+
+// Adjust BCD of register A
+byte CPU::DAA() {
+	byte a, c, h, n;
+	printf("DAA: %x", a = get8(A));
+
+	byte correction = 0;
+	c = getC(); h = getH(); n = getN();
+	if (!n) {
+		if (c || ( a > 0x99)) { a += 0x60; setC(1); }
+		if (h || (a&0x0f) > 0x09) { a += 0x6; }
+	} else {
+		if (c) { a -= 0x60; }
+		if (h) { a -= 0x6; }
+	}
+	setZ(a==0);
+	setH(0);
+	return 4;
+}
+
+// Set Carry Flag
+byte CPU::SCF() { printf("SCF"); }
 // ----------
 
 // Control

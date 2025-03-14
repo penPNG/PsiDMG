@@ -116,10 +116,10 @@ private:
 	byte DECM(word);	// Decrement Memory
 	byte DEC16(reg16);	// Decrement 16 Bit Register
 
-	byte CPL(word);		// One's complement Register A
-	byte CCF(word);		// Flip Carry Flag
-	byte DAA(word);		// Adjust BCD of register A
-	byte SCF(word);		// Set Carry Flag
+	byte CPL();		// One's complement Register A
+	byte CCF();		// Flip Carry Flag
+	byte DAA();		// Adjust BCD of register A
+	byte SCF();		// Set Carry Flag
 
 	// Control
 	byte NOP(word);		// Advance PC by one
