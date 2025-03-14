@@ -565,13 +565,67 @@ byte CPU::CPI(byte n) {
 	return 8;
 }
 
-byte CPU::INC(word op) { printf("INC"); }
+// Increment Register
+byte CPU::INC(reg8 reg) {
+	byte a;
+	printf("INC: %d", a = get8(reg));
 
-byte CPU::INC16(word op) { printf("INC16"); }
+	setZ(a + 1 == 0); setN(0);
+	setH(((a & 0x0F) + 1) & 0x10);
+	set8(reg, a+1);
+	return 4;
+}
 
-byte CPU::DEC(word op) { printf("DEC"); }
+// Increment Memory
+byte CPU::INCM(word addr) {
+	byte a;
+	printf("INC: %d", a = getRam(addr));
 
-byte CPU::DEC16(word op) { printf("DEC16"); }
+	setZ(a + 1 == 0); setN(0);
+	setH(((a & 0x0F) + 1) & 0x10);
+	setRam(addr, a + 1);
+	return 12;
+}
+
+// Increment 16 Bit Register
+byte CPU::INC16(reg16 reg) {
+	word a;
+	printf("INC16: %d", a = get16(reg));
+
+	set16(reg, a+1);
+	return 8;
+}
+
+// Decrement Register
+byte CPU::DEC(reg8 reg) {
+	byte a;
+	printf("INC: %d", a = get8(reg));
+
+	setZ(a - 1 == 0); setN(1);
+	setH((a & 0x0F) == 0x00);
+	set8(reg, a - 1);
+	return 4;
+}
+
+// Decrement Memory
+byte CPU::DECM(word addr) {
+	byte a;
+	printf("INC: %d", a = getRam(addr));
+
+	setZ(a - 1 == 0); setN(1);
+	setH((a & 0x0F) == 0x00);
+	setRam(addr, a - 1);
+	return 12;
+}
+
+// Decrement 16 Bit Register
+byte CPU::DEC16(reg16 reg) {
+	word a;
+	printf("INC16: %d", a = get16(reg));
+
+	set16(reg, a - 1);
+	return 8;
+}
 
 byte CPU::CPL(word op) { printf("CPL"); }
 
