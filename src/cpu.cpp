@@ -330,6 +330,7 @@ byte CPU::ADD16(reg16 reg) {
 	return 8;
 }
 
+// ADD Signed Byte to SP
 byte CPU::ADD16I(sbyte n) {
 	word a;
 	printf("ADD16: %d %d %d", a = get16(SP), n);
@@ -342,11 +343,83 @@ byte CPU::ADD16I(sbyte n) {
 	return 16;
 }
 
-byte CPU::SUB(word op) { printf("SUB"); }
+// SUB Register from A
+byte CPU::SUB(reg8 reg) {
+	byte a, n;
+	printf("SUB: %d %d", a = get8(A), n = get8(reg));
 
-byte CPU::SBC(word op) { printf("SBC"); }
+	word res = a - n;
+	setZ(res==0); setN(1);
+	setH((a & 0x0F) < (n & 0x0F));
+	setC(a < n);
+	set8(A, a - n);
+	return 4;
+}
 
-byte CPU::AND(word op) { printf("AND"); }
+// SUB Memory from A
+byte CPU::SUBM(word addr) {
+	byte a, n;
+	printf("SUB: %d %d", a = get8(A), n = getRam(addr));
+
+	word res = a - n;
+	setZ(res == 0); setN(1);
+	setH((a & 0x0F) < (n & 0x0F));
+	setC(a < n);
+	set8(A, a - n);
+	return 8;
+}
+
+// SUB Immediate from A
+byte CPU::SUBI(byte n) {
+	byte a;
+	printf("SUB: %d %d", a = get8(A), n);
+
+	word res = a - n;
+	setZ(res == 0); setN(1);
+	setH((a & 0x0F) < (n & 0x0F));
+	setC(a < n);
+	set8(A, a-n);
+	return 8;
+}
+
+// SUB with Carry Register from A
+byte CPU::SBC(reg8 reg) {
+	byte a, n, c;
+	printf("SBC: %d %d %d", a = get8(A), n = get8(reg), c = getC());
+
+	word res = a - (n+c);
+	setZ(res == 0); setN(1);
+	setH((a & 0x0F) < (n & 0x0F)+c);
+	setC(a < n+c);
+	set8(A, a - (n+c));
+	return 4;
+}
+
+// SUB with Carry Memory from A
+byte CPU::SBCM(word addr) {
+	byte a, n, c;
+	printf("SBCM: %d %d %d", a = get8(A), n = getRam(addr), c = getC());
+
+	word res = a - (n + c);
+	setZ(res == 0); setN(1);
+	setH((a & 0x0F) < (n & 0x0F) + c);
+	setC(a < n + c);
+	set8(A, a - (n + c));
+	return 8;
+}
+
+// SUB with Carry Immediate from A
+byte CPU::SBCI(byte n) {
+	byte a, c;
+	printf("SBCI: %d %d %d", a = get8(A), n, c = getC());
+
+	word res = a - (n + c);
+	setZ(res == 0); setN(1);
+	setH((a & 0x0F) < (n & 0x0F) + c);
+	setC(a < n + c);
+	set8(A, a - (n + c));
+	return 8;
+}
 
 byte CPU::XOR(word op) { printf("XOR"); }
 
