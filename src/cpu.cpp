@@ -421,7 +421,113 @@ byte CPU::SBCI(byte n) {
 	return 8;
 }
 
-byte CPU::XOR(word op) { printf("XOR"); }
+// AND Register with A
+byte CPU::AND(reg8 reg) {
+	byte a, n;
+	printf("AND: %d %d", a = get8(A), n = get8(reg));
+
+	byte res = a & n;
+	setZ(res == 0); setN(0);
+	setH(1); setC(0);
+	set8(A, res);
+	return 4;
+}
+
+// AND Memory with A
+byte CPU::ANDM(word addr) {
+	byte n, a;
+	printf("ANDM: %d %d", a = get8(A), n = getRam(addr));
+
+	byte res = a & n;
+	setZ(res == 0); setN(0);
+	setH(1); setC(0);
+	set8(A, res);
+	return 8;
+}
+
+// AND Immediate with A
+byte CPU::ANDI(byte n) {
+	byte a;
+	printf("ANDI: %d %d", a = get8(A), n);
+
+	byte res = a & n;
+	setZ(res == 0); setN(0);
+	setH(1); setC(0);
+	set8(A, res);
+	return 8;
+}
+
+// XOR Register with A
+byte CPU::XOR(reg8 reg) {
+	byte a, n;
+	printf("XOR: %d %d", a = get8(A), n = get8(reg));
+
+	byte res = a ^ n;
+	setZ(res == 0); setN(0);
+	setH(0); setC(0);
+	set8(A, res);
+	return 4;
+}
+
+// XOR Memory with A
+byte CPU::XORM(word addr) {
+	byte n, a;
+	printf("XORM: %d %d", a = get8(A), n = getRam(addr));
+
+	byte res = a ^ n;
+	setZ(res == 0); setN(0);
+	setH(0); setC(0);
+	set8(A, res);
+	return 8;
+}
+
+// XOR Immediate with A
+byte CPU::XORI(byte n) {
+	byte a;
+	printf("XORI: %d %d", a = get8(A), n);
+
+	byte res = a ^ n;
+	setZ(res == 0); setN(0);
+	setH(0); setC(0);
+	set8(A, res);
+	return 8;
+}
+
+// OR Register with A
+byte CPU::OR(reg8 reg) {
+	byte a, n;
+	printf("ADD: %d %d", a = get8(A), n = get8(reg));
+
+	byte res = a | n;
+	setZ(res == 0); setN(0);
+	setH(0); setC(0);
+	set8(A, res);
+	return 4;
+}
+
+// OR Memory with A
+byte CPU::ORM(word addr) {
+	byte n, a;
+	printf("ADDM: %d %d", a = get8(A), n = getRam(addr));
+
+	byte res = a | n;
+	setZ(res == 0); setN(0);
+	setH(0); setC(0);
+	set8(A, res);
+	return 8;
+}
+
+// OR Immediate with A
+byte CPU::ORI(byte n) {
+	byte a;
+	printf("ADDI: %d %d", a = get8(A), n);
+
+	byte res = a | n;
+	setZ(res == 0); setN(0);
+	setH(0); setC(0);
+	set8(A, res);
+	return 8;
+}
 
 byte CPU::OR(word op) { printf("OR"); }
 

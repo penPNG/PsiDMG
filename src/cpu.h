@@ -99,7 +99,7 @@ private:
 	byte XOR(reg8);		// XOR Register with A
 	byte XORM(word);	// XOR Memory with A
 	byte XORI(byte);	// XOR Immediate with A
-
+	
 	byte OR(reg8);		// OR Register with A
 	byte ORM(word);		// OR Memory with A
 	byte ORI(byte);		// OR Immediate with A
