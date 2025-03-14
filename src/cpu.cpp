@@ -294,7 +294,7 @@ byte CPU::ADC(reg8 reg) {
 // ADD with Carry emory to A
 byte CPU::ADCM(word addr) {
 	byte a, n, c;
-	printf("ADCM: %d %d %d", a = get8(a), n = getRam(addr), c = getC());
+	printf("ADCM: %d %d %d", a = get8(A), n = getRam(addr), c = getC());
 
 	word res = a+n+c; 
 	setZ(res == 0); setN(0);
@@ -529,9 +529,41 @@ byte CPU::ORI(byte n) {
 	return 8;
 }
 
-byte CPU::OR(word op) { printf("OR"); }
+// Compare Register with A for equality
+byte CPU::CP(reg8 reg) {
+	byte a, n;
+	printf("CP: %d %d", a = get8(A), n = get8(reg));
 
-byte CPU::CP(word op) { printf("CP"); }
+	word res = a - n;
+	setZ(res == 0); setN(1);
+	setH((a & 0x0F) < (n & 0x0F));
+	setC(a < n);
+	return 4;
+}
+
+// Compare Memory with A for equality
+byte CPU::CPM(word addr) {
+	byte a, n;
+	printf("CPM: %d %d", a = get8(A), n = getRam(addr));
+
+	word res = a - n;
+	setZ(res == 0); setN(1);
+	setH((a & 0x0F) < (n & 0x0F));
+	setC(a < n);
+	return 8;
+}
+
+// Compare Immediate with A for equality
+byte CPU::CPI(byte n) {
+	byte a;
+	printf("CPI: %d %d", a = get8(A), n);
+
+	word res = a - n;
+	setZ(res == 0); setN(1);
+	setH((a & 0x0F) < (n & 0x0F));
+	setC(a < n);
+	return 8;
+}
 
 byte CPU::INC(word op) { printf("INC"); }
 
