@@ -666,30 +666,44 @@ byte CPU::DAA() {
 }
 
 // Set Carry Flag
-byte CPU::SCF() { printf("SCF"); }
+byte CPU::SCF() { 
+	printf("SCF: %d", getC());
+
+	setN(0); setH(0); setC(1);
+	return 4;
+}
 // ----------
 
 // Control
 // -------
-byte CPU::NOP(word op) { printf("NOP"); }
+byte CPU::NOP(word op) { printf("NOP : 0"); return 4; }
 
-byte CPU::STOP(word op) { printf("STOP"); }
+byte CPU::STOP(word op) { printf("STOP"); return 4; }
 
-byte CPU::HALT(word op) { printf("HALT"); }
+byte CPU::HALT(word op) { printf("HALT"); return 4; }
 
-byte CPU::PREF(word op) {
-	if (op == 0x3244) { printf("PREF"); return; }
-	//CBInst[op & 0x00FF](op);
+byte CPU::PREF(byte ins) {
+	if (ins == 0) printf("PREF");
+	return 4;
 }
 
-byte CPU::DI(word op) { printf("DI"); }
+byte CPU::DI(word op) { 
+	printf("DI");
+	return 4;
+}
 
-byte CPU::EI(word op) { printf("EI"); }
+byte CPU::EI(word op) { 
+	printf("EI");
+	return 4;
+}
 // -------
 
 // Jump / Call
 // -----------
-byte CPU::JR(word op) { printf("JR"); }
+byte CPU::JR(sbyte n) { 
+	printf("JR: %d", n); 
+
+}
 
 byte CPU::JP(word op) { printf("JP"); }
 
