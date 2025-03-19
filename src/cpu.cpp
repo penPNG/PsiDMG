@@ -702,10 +702,65 @@ byte CPU::EI(word op) {
 // -----------
 byte CPU::JR(sbyte n) { 
 	printf("JR: %d", n); 
-
+	PC += n;
+	return 8;
 }
 
-byte CPU::JP(word op) { printf("JP"); }
+byte CPU::JRS(flag f, sbyte n) {
+	bool F;
+	switch (f) {
+		case flagZ: F = getZ(); break;
+		case flagC: F = getC(); break;
+	}
+	printf("JRS: %d %d", F, n);
+	if (F) { PC += n; }
+	return 8;
+}
+
+byte CPU::JRN(flag f, sbyte n) {
+	bool F;
+	switch (f) {
+		case flagZ: F = getZ(); break; 
+		case flagC: F = getC(); break;
+	}
+	printf("JRN: %d %d", F, n);
+	if (!F) { PC += n; }
+	return 8;
+}
+
+byte CPU::JP(word addr) {
+	printf("JP: %X", addr); 
+	PC = addr;
+	return 12;
+}
+
+byte CPU::JPHL() {
+	printf("JPHL: %X", get16(HL));
+	PC = get16(HL);
+	return 4;
+}
+
+byte CPU::JPS(flag f, word addr) {
+	bool F;
+	switch (f) {
+		case flagZ: F = getZ(); break;
+		case flagC: F = getC(); break;
+}
+	printf("JPS: %d %X", F, addr);
+	if (F) { PC = addr; }
+	return 8;
+}
+
+byte CPU::JPN(flag f, word addr) {
+	bool F;
+	switch (f) {
+		case flagZ: F = getZ(); break;
+		case flagC: F = getC(); break;
+	}
+	printf("JPN: %d %X", F, addr);
+	if (!F) { PC = addr; }
+	return 8;
+}
 
 byte CPU::CALL(word op) { printf("CALL"); }
 
