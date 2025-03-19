@@ -43,12 +43,21 @@ public:
 	void setC(bool);
 	// -------------------
 
+	// Ram Functions
+	// -------------
 	byte getRam(word);
 	void setRam(word, byte);
 
-private:
+	void push(word);
+	word pop();
+	// -------------
+
+public:
 	Registers registers;
-	word PC;
+	word PC;	// Program Counter
+	bool IME;	// Interrupt Master Enable
+
+private:
 	
 	//using reg8 = byte;
 	/*using reg16 = word;
@@ -144,10 +153,10 @@ private:
 
 	byte RST(byte);			// Push PC to Stack, Jump to $0000 + Byte
 
-	byte RET();				// Pop stack to PC
-	byte RTS(flag);			// Pop stack to PC if Flag is set
-	byte RTN(flag);			// Pop stack to PC if FLag is not set
-	byte RETI(word);		// Return with interupts
+	byte RET();				// Pop Stack to PC
+	byte RTS(flag);			// Pop Stack to PC if Flag is set
+	byte RTN(flag);			// Pop Stack to PC if FLag is not set
+	byte RETI();		// Return with interupts
 
 	// Bit Manipulation
 	byte RLCA();		// Rotate Register A Left with Carry

@@ -12,23 +12,78 @@ CPU::CPU(Memory& _ram) : ram(_ram) {
 
 // Reigster Functions
 // ------------------
+
+// Get 8 Bit Register
 byte CPU::get8(reg8 reg) { return registers.reg8[reg]; }
+
+// Get 16 Bit Register
 word CPU::get16(reg16 reg) {return registers.reg16[reg]; }
 
+
+// Set 8 Bit Register
 void CPU::set8(reg8 reg, byte b) { registers.reg8[reg] = b; }
+
+// Set 16 Bit Register
 void CPU::set16(reg16 reg, word w) { registers.reg16[reg] = w; }
+
+// Set 16 Bit Register
 void CPU::set16(reg16 reg, byte l, byte h) { registers.reg16[reg] = (l | (h << 8)); }
 
+
+// Get Z Flag
 bool CPU::getZ() { return registers.reg8[F] >> 7; }
+
+// Get N Flag
 bool CPU::getN() { return (registers.reg8[F] & 0b01000000) >> 6; }
+
+// Get H Flag
 bool CPU::getH() { return (registers.reg8[F] & 0b00100000) >> 5; }
+
+// Get C Flag
 bool CPU::getC() { return (registers.reg8[F] & 0b00010000) >> 4; }
 
+
+// Set Z Flag
 void CPU::setZ(bool z) { if (z) { set8(F, flagZ); } else { registers.reg8[F] &= ~flagZ; } }
+
+// Set N Flag
 void CPU::setN(bool n) { if (n) { set8(F, flagN); } else { registers.reg8[F] &= ~flagN; } }
+
+// Set H Flag
 void CPU::setH(bool h) { if (h) { set8(F, flagH); } else { registers.reg8[F] &= ~flagH; } }
+
+// Set C Flag
 void CPU::setC(bool c) { if (c) { set8(F, flagC); } else { registers.reg8[F] &= ~flagC; } }
 // -------------------
+
+// Ram Functions
+// -------------
+// TODO make safer functions!
+
+// Get Ram from Address
+byte CPU::getRam(word addr) {
+	return ram.ram[addr];
+}
+
+// Set Ram at Address
+void CPU::setRam(word addr, byte data) {
+	ram.ram[addr] = data;
+}
+
+// Push Word to Stack
+void CPU::push(word w) {
+	setRam(--registers.reg16[SP], w & (0xFF00 >> 8));
+	setRam(--registers.reg16[SP], w & 0x00FF);
+}
+
+// Pop Word from Stack
+word CPU::pop() {
+	word w = getRam(registers.reg16[SP]++);
+	w |= getRam(registers.reg16[SP]++) << 8;
+	return w;
+}
+
+// -------------
 
 void CPU::exec(word op) {
 	byte inst = (op & 0xFF00) >> 8;
@@ -695,12 +750,14 @@ byte CPU::PREF(byte ins) {
 // Disable Interupts
 byte CPU::DI(word op) { 
 	printf("DI");
+	IME = 0;
 	return 4;
 }
 
 // Enable Interupts
 byte CPU::EI(word op) { 
 	printf("EI");
+	IME = 1;
 	return 4;
 }
 // -------
@@ -777,6 +834,7 @@ byte CPU::JPN(flag f, word addr) {
 	return 8;
 }
 
+// Call given Address
 byte CPU::CALL(word addr) { 
 	printf("CALL: %X", addr);
 	push(PC);
@@ -816,9 +874,44 @@ byte CPU::RST(byte n) {
 	return 32;
 }
 
-byte CPU::RET(word op) { printf("RET"); }
+// Pop Stack to PC
+byte CPU::RET() {
+	printf("RET: %X", PC);
+	PC = pop();
+	return 8;
+}
 
-byte CPU::RETI(word op) { printf("RETI"); }
+// Pop Stack to PC if Flag is set
+byte CPU::RTS(flag f) {
+	bool F;
+	switch (f) {
+		case flagZ: F = getZ(); break;
+		case flagC: F = getC(); break;
+	}
+	printf("RTS: %d %X", F, PC);
+	if (F) { PC = pop(); }
+	return 8;
+}
+
+// Pop Stack to PC if Flag is not set
+byte CPU::RTN(flag f) {
+	bool F;
+	switch (f) {
+		case flagZ: F = getZ(); break;
+		case flagC: F = getC(); break;
+	}
+	printf("RTN: %d %X", F, PC);
+	if (!F) { PC = pop(); }
+	return 8;
+}
+
+// Pop Stack to PC and Enable Interupts
+byte CPU::RETI() {
+	printf("RETI: %X", PC);
+	PC = pop();
+	IME = 1;
+	return 8;
+}
 
 byte CPU::no(word op) { printf("NOP"); }
 
@@ -855,12 +948,3 @@ byte CPU::RES(word op) { printf("RES"); }
 byte CPU::SET(word op) { printf("SET"); }
 
 // ------------
-
-// TODO make safer functions!
-byte CPU::getRam(word addr) {
-	return ram.ram[addr];
-}
-
-void CPU::setRam(word addr, byte data) {
-	ram.ram[addr] = data;
-}
