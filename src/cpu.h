@@ -137,7 +137,7 @@ private:
 	byte JPHL();			// Jump to HL
 	byte JPS(flag, word);	// Jump to given Address if Flag is set
 	byte JPN(flag, word);	// Jump to given Address if Flag is not set
-
+	
 	byte CALL(word);		// Call given Address
 	byte CLLS(flag, word);	// Call given Address if Flag is set
 	byte CLLN(flag, word);	// Call given Address if Flag is not set

@@ -676,22 +676,29 @@ byte CPU::SCF() {
 
 // Control
 // -------
+
+// Advance PC by one
 byte CPU::NOP(word op) { printf("NOP : 0"); return 4; }
 
+// Stop the clock... chaos ensues
 byte CPU::STOP(word op) { printf("STOP"); return 4; }
 
+// A special tool we're saving for later
 byte CPU::HALT(word op) { printf("HALT"); return 4; }
 
+// Prefix for CB instructions
 byte CPU::PREF(byte ins) {
 	if (ins == 0) printf("PREF");
 	return 4;
 }
 
+// Disable Interupts
 byte CPU::DI(word op) { 
 	printf("DI");
 	return 4;
 }
 
+// Enable Interupts
 byte CPU::EI(word op) { 
 	printf("EI");
 	return 4;
@@ -700,12 +707,15 @@ byte CPU::EI(word op) {
 
 // Jump / Call
 // -----------
+
+// Jump the value of the Signed Byte
 byte CPU::JR(sbyte n) { 
 	printf("JR: %d", n);
 	PC += n;
 	return 8;
 }
 
+// Jump the value of the Signed Byte if Flag is set
 byte CPU::JRS(flag f, sbyte n) {
 	bool F;
 	switch (f) {
@@ -717,6 +727,7 @@ byte CPU::JRS(flag f, sbyte n) {
 	return 8;
 }
 
+// Jump the value of the Signed Byte if Flag is not set
 byte CPU::JRN(flag f, sbyte n) {
 	bool F;
 	switch (f) {
@@ -728,18 +739,21 @@ byte CPU::JRN(flag f, sbyte n) {
 	return 8;
 }
 
+// Jump to given Address
 byte CPU::JP(word addr) {
 	printf("JP: %X", addr); 
 	PC = addr;
 	return 12;
 }
 
+// Jump to HL
 byte CPU::JPHL() {
 	printf("JPHL: %X", get16(HL));
 	PC = get16(HL);
 	return 4;
 }
 
+// Jump to given Address if Flag is set
 byte CPU::JPS(flag f, word addr) {
 	bool F;
 	switch (f) {
@@ -751,6 +765,7 @@ byte CPU::JPS(flag f, word addr) {
 	return 8;
 }
 
+// Jump to given Address if Flag is not set
 byte CPU::JPN(flag f, word addr) {
 	bool F;
 	switch (f) {
@@ -762,7 +777,9 @@ byte CPU::JPN(flag f, word addr) {
 	return 8;
 }
 
-byte CPU::CALL(word op) { printf("CALL"); }
+byte CPU::CALL(word addr) { 
+	printf("CALL"); 
+}
 
 byte CPU::RST(word op) { printf("RST"); }
 
