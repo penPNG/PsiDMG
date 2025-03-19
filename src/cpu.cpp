@@ -19,15 +19,15 @@ void CPU::set8(reg8 reg, byte b) { registers.reg8[reg] = b; }
 void CPU::set16(reg16 reg, word w) { registers.reg16[reg] = w; }
 void CPU::set16(reg16 reg, byte l, byte h) { registers.reg16[reg] = (l | (h << 8)); }
 
-byte CPU::getZ() { return registers.reg8[F] >> 7; }
-byte CPU::getN() { return (registers.reg8[F] & 0b01000000) >> 6; }
-byte CPU::getH() { return (registers.reg8[F] & 0b00100000) >> 5; }
-byte CPU::getC() { return (registers.reg8[F] & 0b00010000) >> 4; }
+bool CPU::getZ() { return registers.reg8[F] >> 7; }
+bool CPU::getN() { return (registers.reg8[F] & 0b01000000) >> 6; }
+bool CPU::getH() { return (registers.reg8[F] & 0b00100000) >> 5; }
+bool CPU::getC() { return (registers.reg8[F] & 0b00010000) >> 4; }
 
-void CPU::setZ(bool z) { if (z) { set8(F, flagZ); } }
-void CPU::setN(bool n) { if (n) { set8(F, flagN); } }
-void CPU::setH(bool h) { if (h) { set8(F, flagH); } }
-void CPU::setC(bool c) { if (c) { set8(F, flagC); } }
+void CPU::setZ(bool z) { if (z) { set8(F, flagZ); } else { registers.reg8[F] &= ~flagZ; } }
+void CPU::setN(bool n) { if (n) { set8(F, flagN); } else { registers.reg8[F] &= ~flagN; } }
+void CPU::setH(bool h) { if (h) { set8(F, flagH); } else { registers.reg8[F] &= ~flagH; } }
+void CPU::setC(bool c) { if (c) { set8(F, flagC); } else { registers.reg8[F] &= ~flagC; } }
 // -------------------
 
 void CPU::exec(word op) {
@@ -280,10 +280,10 @@ byte CPU::ADDI(byte n) {
 
 // ADD with Carry Register to A
 byte CPU::ADC(reg8 reg) { 
-	byte a, n, c;
+	byte a, n; bool c;
 	printf("ADC: %d %d %d", a = get8(A), n = get8(reg), c = getC());
 
-	word res = a+n+c;
+	word res = c ? a+n+1 : a+n;
 	setZ(res == 0); setN(0);
 	setH(((a & 0x0F) + (n & 0x0F) + c) & 0x10);
 	setC(res & 0x0100);
@@ -293,10 +293,10 @@ byte CPU::ADC(reg8 reg) {
 
 // ADD with Carry emory to A
 byte CPU::ADCM(word addr) {
-	byte a, n, c;
+	byte a, n; bool c;
 	printf("ADCM: %d %d %d", a = get8(A), n = getRam(addr), c = getC());
 
-	word res = a+n+c; 
+	word res = c ? a + n + 1 : a + n;
 	setZ(res == 0); setN(0);
 	setH(((a & 0x0F) + (n & 0x0F) + c) & 0x10);
 	setC(res & 0x0100);
@@ -306,10 +306,10 @@ byte CPU::ADCM(word addr) {
 
 // ADD with Carry Immediate to A
 byte CPU::ADCI(byte n) {
-	byte a, c;
+	byte a; bool c;
 	printf("ADCM: %d %d %d", a = get8(A), n, c = getC());
 
-	word res = a + n + c;
+	word res = c ? a + n + 1 : a + n;
 	setZ(res == 0); setN(0);
 	setH(((a & 0x0F) + (n & 0x0F) + c) & 0x10);
 	setC(res & 0x0100);
@@ -384,10 +384,10 @@ byte CPU::SUBI(byte n) {
 
 // SUB with Carry Register from A
 byte CPU::SBC(reg8 reg) {
-	byte a, n, c;
+	byte a, n; bool c;
 	printf("SBC: %d %d %d", a = get8(A), n = get8(reg), c = getC());
 
-	word res = a - (n+c);
+	word res = c ? a - (n+1) : a - n;
 	setZ(res == 0); setN(1);
 	setH((a & 0x0F) < (n & 0x0F)+c);
 	setC(a < n+c);
@@ -397,10 +397,10 @@ byte CPU::SBC(reg8 reg) {
 
 // SUB with Carry Memory from A
 byte CPU::SBCM(word addr) {
-	byte a, n, c;
+	byte a, n; bool c;
 	printf("SBCM: %d %d %d", a = get8(A), n = getRam(addr), c = getC());
 
-	word res = a - (n + c);
+	word res = c ? a - (n + 1) : a - n;
 	setZ(res == 0); setN(1);
 	setH((a & 0x0F) < (n & 0x0F) + c);
 	setC(a < n + c);
@@ -410,10 +410,10 @@ byte CPU::SBCM(word addr) {
 
 // SUB with Carry Immediate from A
 byte CPU::SBCI(byte n) {
-	byte a, c;
+	byte a; bool c;
 	printf("SBCI: %d %d %d", a = get8(A), n, c = getC());
 
-	word res = a - (n + c);
+	word res = c ? a - (n + 1) : a - n;
 	setZ(res == 0); setN(1);
 	setH((a & 0x0F) < (n & 0x0F) + c);
 	setC(a < n + c);
@@ -639,7 +639,7 @@ byte CPU::CPL() {
 
 // Flip Carry Flag
 byte CPU::CCF() { 
-	byte c;
+	bool c;
 	printf("CCF: %d", c = getC()); 
 
 	setC(!c);
@@ -648,7 +648,7 @@ byte CPU::CCF() {
 
 // Adjust BCD of register A
 byte CPU::DAA() {
-	byte a, c, h, n;
+	byte a; bool c, h, n;
 	printf("DAA: %x", a = get8(A));
 
 	byte correction = 0;
@@ -701,7 +701,7 @@ byte CPU::EI(word op) {
 // Jump / Call
 // -----------
 byte CPU::JR(sbyte n) { 
-	printf("JR: %d", n); 
+	printf("JR: %d", n);
 	PC += n;
 	return 8;
 }
@@ -745,7 +745,7 @@ byte CPU::JPS(flag f, word addr) {
 	switch (f) {
 		case flagZ: F = getZ(); break;
 		case flagC: F = getC(); break;
-}
+	}
 	printf("JPS: %d %X", F, addr);
 	if (F) { PC = addr; }
 	return 8;

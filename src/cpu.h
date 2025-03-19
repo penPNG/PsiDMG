@@ -32,10 +32,10 @@ public:
 	void set16(reg16, word);
 	void set16(reg16, byte, byte);
 
-	byte getZ();
-	byte getN();
-	byte getH();
-	byte getC();
+	bool getZ();
+	bool getN();
+	bool getH();
+	bool getC();
 
 	void setZ(bool);
 	void setN(bool);
@@ -194,6 +194,6 @@ private:
 private:
 
 	Memory& ram;
-	word opc;
+	word op;
 
 };
