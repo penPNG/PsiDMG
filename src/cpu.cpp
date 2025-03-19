@@ -778,10 +778,43 @@ byte CPU::JPN(flag f, word addr) {
 }
 
 byte CPU::CALL(word addr) { 
-	printf("CALL"); 
+	printf("CALL: %X", addr);
+	push(PC);
+	PC = addr;
+	return 12;
 }
 
-byte CPU::RST(word op) { printf("RST"); }
+// Call given Address if Flag is set
+byte CPU::CLLS(flag f, word addr) {
+	bool F;
+	switch (f) {
+		case flagZ: F = getZ(); break;
+		case flagC: F = getC(); break;
+	}
+	printf("CALL: %d %X", F, addr);
+	if (F) { push(PC); PC = addr; }
+	return 12;
+}
+
+// Call given Address if Flag is not set
+byte CPU::CLLN(flag f, word addr) {
+	bool F;
+	switch (f) {
+		case flagZ: F = getZ(); break;
+		case flagC: F = getC(); break;
+	}
+	printf("CALL: %d %X", F, addr);
+	if (!F) { push(PC); PC = addr; }
+	return 12;
+}
+
+// Push PC to Stack, Jump to $0000 + Byte
+byte CPU::RST(byte n) {
+	printf("RST: %X", n);
+	push(PC);
+	PC = n;
+	return 32;
+}
 
 byte CPU::RET(word op) { printf("RET"); }
 
