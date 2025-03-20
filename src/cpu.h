@@ -14,14 +14,7 @@ class CPU {
 public:
 	CPU(Memory&);
 
-	void exec(word);
-
-	//inline static void (*inst[256]) (word);
-	/*void (CPU::*CBInst[256]) (word);
-	inline static byte (*getReg[8]) ();
-	inline static word (*getReg16[6]) ();
-	inline static void (*setReg[8]) (byte);
-	inline static void (*setReg16[6]) (word);*/
+	void exec(byte);
 
 	// Regiseter Functions
 	// -------------------
@@ -58,14 +51,6 @@ public:
 	bool IME;	// Interrupt Master Enable
 
 private:
-	
-	//using reg8 = byte;
-	/*using reg16 = word;
-	static constexpr reg8 A = 1, F = 0, B = 3, C = 2, D = 5, E = 4, H = 7, L = 6;
-	static constexpr reg16 AF = 0, BC = 1, DE = 2, HL = 3, SP = 4;*/
-
-	void initInst();
-
 	// Load
 	byte LD(reg8, reg8);		// Load standard
 	byte LDI(reg8, byte);		// Load Immediate to Register
@@ -131,11 +116,11 @@ private:
 	byte SCF();		// Set Carry Flag
 
 	// Control
-	byte NOP(word);		// Advance PC by one
-	byte STOP(word);	// Stop the clock... chaos ensues
-	byte HALT(word);	// A special tool we're saving for later
-	byte DI(word);		// Disable Interupts
-	byte EI(word);		// Enable Interupts
+	byte NOP();		// Advance PC by one
+	byte STOP();	// Stop the clock... chaos ensues
+	byte HALT();	// A special tool we're saving for later
+	byte DI();		// Disable Interupts
+	byte EI();		// Enable Interupts
 
 	// Jump / Call
 	byte JR(sbyte);			// Jump the value of the Signed Byte

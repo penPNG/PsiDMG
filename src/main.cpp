@@ -9,7 +9,6 @@
 #include <iostream>
 
 int main(char* argv) {
-	std::size_t;
 	DMG* dmg = new DMG();
 
 	if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMEPAD)) {

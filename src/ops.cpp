@@ -61,7 +61,7 @@ byte CPU::LD16SPHL() {
 
 // Load to HL from SP + Signed Byte
 byte CPU::LD16HLSP(sbyte sb) {
-	byte sp;
+	word sp;
 	printf("LD16HLSP: %d %d %d", get16(HL), sp = get16(SP), sb);
 
 	word res = sp + sb;
@@ -184,7 +184,7 @@ byte CPU::ADCI(byte n) {
 // ADD 16 Bit Register to HL
 byte CPU::ADD16(reg16 reg) {
 	word a, n;
-	printf("ADD16: %d %d %d", a = get16(HL), n = get16(reg));
+	printf("ADD16: %d %d", a = get16(HL), n = get16(reg));
 
 	unsigned int res = a + n;
 	setN(0);
@@ -197,7 +197,7 @@ byte CPU::ADD16(reg16 reg) {
 // ADD Signed Byte to SP
 byte CPU::ADD16I(sbyte n) {
 	word a;
-	printf("ADD16: %d %d %d", a = get16(SP), n);
+	printf("ADD16: %d %d", a = get16(SP), n);
 
 	unsigned int res = a + n;
 	setZ(0); setN(0);
@@ -543,29 +543,23 @@ byte CPU::SCF() {
 // -------
 
 // Advance PC by one
-byte CPU::NOP(word op) { printf("NOP : 0"); return 4; }
+byte CPU::NOP() { printf("NOP : 0"); return 4; }
 
 // Stop the clock... chaos ensues
-byte CPU::STOP(word op) { printf("STOP"); return 4; }
+byte CPU::STOP() { printf("STOP"); return 4; }
 
 // A special tool we're saving for later
-byte CPU::HALT(word op) { printf("HALT"); return 4; }
-
-// Prefix for CB instructions
-byte CPU::PREF(byte ins) {
-	if (ins == 0) printf("PREF");
-	return 4;
-}
+byte CPU::HALT() { printf("HALT"); return 4; }
 
 // Disable Interupts
-byte CPU::DI(word op) {
+byte CPU::DI() {
 	printf("DI");
 	IME = 0;
 	return 4;
 }
 
 // Enable Interupts
-byte CPU::EI(word op) {
+byte CPU::EI() {
 	printf("EI");
 	IME = 1;
 	return 4;
@@ -588,6 +582,7 @@ byte CPU::JRS(flag f, sbyte n) {
 	switch (f) {
 		case flagZ: F = getZ(); break;
 		case flagC: F = getC(); break;
+		default: F = 0; break;
 	}
 	printf("JRS: %d %d", F, n);
 	if (F) { PC += n; }
@@ -600,6 +595,7 @@ byte CPU::JRN(flag f, sbyte n) {
 	switch (f) {
 		case flagZ: F = getZ(); break;
 		case flagC: F = getC(); break;
+		default: F = 0; break;
 	}
 	printf("JRN: %d %d", F, n);
 	if (!F) { PC += n; }
@@ -626,6 +622,7 @@ byte CPU::JPS(flag f, word addr) {
 	switch (f) {
 		case flagZ: F = getZ(); break;
 		case flagC: F = getC(); break;
+		default: F = 0; break;
 	}
 	printf("JPS: %d %X", F, addr);
 	if (F) { PC = addr; }
@@ -638,6 +635,7 @@ byte CPU::JPN(flag f, word addr) {
 	switch (f) {
 		case flagZ: F = getZ(); break;
 		case flagC: F = getC(); break;
+		default: F = 0; break;
 	}
 	printf("JPN: %d %X", F, addr);
 	if (!F) { PC = addr; }
@@ -658,6 +656,7 @@ byte CPU::CLLS(flag f, word addr) {
 	switch (f) {
 		case flagZ: F = getZ(); break;
 		case flagC: F = getC(); break;
+		default: F = 0; break;
 	}
 	printf("CALL: %d %X", F, addr);
 	if (F) { push(PC); PC = addr; }
@@ -670,6 +669,7 @@ byte CPU::CLLN(flag f, word addr) {
 	switch (f) {
 		case flagZ: F = getZ(); break;
 		case flagC: F = getC(); break;
+		default: F = 0; break;
 	}
 	printf("CALL: %d %X", F, addr);
 	if (!F) { push(PC); PC = addr; }
@@ -697,6 +697,7 @@ byte CPU::RTS(flag f) {
 	switch (f) {
 		case flagZ: F = getZ(); break;
 		case flagC: F = getC(); break;
+		default: F = 0; break;
 	}
 	printf("RTS: %d %X", F, PC);
 	if (F) { PC = pop(); }
@@ -709,6 +710,7 @@ byte CPU::RTN(flag f) {
 	switch (f) {
 		case flagZ: F = getZ(); break;
 		case flagC: F = getC(); break;
+		default: F = 0; break;
 	}
 	printf("RTN: %d %X", F, PC);
 	if (!F) { PC = pop(); }

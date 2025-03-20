@@ -1,8 +1,6 @@
 #include "cpu.h"
 
 CPU::CPU(Memory& _ram) : ram(_ram) {
-	initInst();
-
 	registers.reg8[A] = 0x01; registers.reg8[F] = FLAG_Z;
 	registers.reg16[BC] = 0x0013;
 	registers.reg16[DE] = 0x00D8;
@@ -85,15 +83,13 @@ word CPU::pop() {
 
 // -------------
 
-void CPU::exec(word op) {
-	byte inst = (op & 0xFF00) >> 8;
-	byte data = (op & 0xFF);
+void CPU::exec(byte op) {
 
-	switch (inst) {
+	switch (op) {
 		// Control Instructions
-		case 0x00: { NOP(op); return; } case 0x10: { STOP(op); return; }
-		case 0xCB: { PREF(op); return; } case 0xF3: { DI(op); return; }
-		case 0xFB: { EI(op); return; }
+		case 0x00: { NOP(); return; } case 0x10: { STOP(); return; }
+		case 0xCB: { PREF(op); return; } case 0xF3: { DI(); return; }
+		case 0xFB: { EI(); return; }
 
 		// Jumps / Calls
 		case 0x18: case 0x20: case 0x28: case 0x30: case 0x38: { JR(op); return; }
@@ -102,91 +98,9 @@ void CPU::exec(word op) {
 	}
 }
 
-void CPU::initInst() {
-	//for (word i = 0; i < 256; i++) {
-	//	inst[i] = &CPU::no;
-	//}
-	//
-	//// Control Instructions
-	//inst[0x00] = &NOP; inst[0x10] = &CPU::STOP;
-	//inst[0xCB] = &CPU::PREF; inst[0xF3] = &CPU::DI;
-	//inst[0xFB] = &CPU::EI;
 
-	//// Jumps / Calls
-	//for (word i = 0x18; i < 0x39; i += 0x8) { inst[i] = &CPU::JR; }
-	//for (word i = 0xC0; i < 0xD9; i += 0x8) { inst[i] = &CPU::RET; }
-	//inst[0xC9] = &CPU::RET;
-	//for (word i = 0xC2; i < 0xDB; i += 0x8) { inst[i] = &CPU::JP; }
-	//inst[0xC3] = &CPU::JP; inst[0xE9] = &CPU::JP;
-	//for (word i = 0xC4; i < 0xDD; i += 0x8) { inst[i] = &CPU::CALL; }
-	//inst[0xCD] = &CPU::CALL;
-	//for (word i = 0xC7; i <= 0xFF; i += 0x8) { inst[i] = &CPU::RST; }
-
-	//// Load Instructions
-	//for (word i = 0x02; i < 0x3F; i += 0x4) { inst[i] = &CPU::LD; }
-	//for (word i = 0x40; i < 0x80; i++) {
-	//	if (i == 0x76) {
-	//		inst[i] = &CPU::HALT;
-	//		continue;
-	//	}
-	//	inst[i] = &CPU::LD;
-	//}
-	//for (word i = 0xE0; i < 0xF3; i += 0x6) {
-	//	inst[i] = &CPU::LDH; i += 2;
-	//	inst[i] = &CPU::LDH; i += 8;
-	//	inst[i] = &CPU::LD;
-	//}
-
-	////// 16 bit Load Instructions
-	//for (word i = 0x01; i < 0x32; i += 0x10) { inst[i] = &CPU::LD16; }
-	//inst[0x08] = &CPU::LD16;
-	//for (word i = 0xC1; i < 0xF6; i += 0xC) {
-	//	inst[i] = &CPU::POP; i+=4;
-	//	inst[i] = &CPU::PUSH;
-	//}
-	//inst[0xF8] = &CPU::LD16; inst[0xF9] = &CPU::LD16;
-
-	////// Arithmetic Instructions
-	//for (word i = 0x04; i < 0x3D; i += 0x8) { inst[i] = &CPU::INC; }
-	//for (word i = 0x05; i < 0x3E; i += 0x8) { inst[i] = &CPU::DEC; }
-	//inst[0x2F] = &CPU::CPL; inst[0x3F] = &CPU::CCF;
-	//for (word i = 0x80; i < 0xC0; i++) {
-	//	if (i < 0x88) { inst[i] = &CPU::ADD; continue; }
-	//	if (i < 0x90) { inst[i] = &CPU::ADC; continue; }
-	//	if (i < 0x98) { inst[i] = &CPU::SUB; continue; }
-	//	if (i < 0xA0) { inst[i] = &CPU::SBC; continue; }
-	//	if (i < 0xA8) { inst[i] = &CPU::AND; continue; }
-	//	if (i < 0xB0) { inst[i] = &CPU::XOR; continue; }
-	//	if (i < 0xB8) { inst[i] = &CPU::OR; continue; }
-	//	inst[i] = &CPU::CP;
-	//}
-	//inst[0x27] = &CPU::DAA; inst[0x2F] = &CPU::CPL;
-	//inst[0x37] = &CPU::SCF; inst[0x3F] = &CPU::CCF;
-	//inst[0xC6] = &CPU::ADD; inst[0xCE] = &CPU::ADC;
-	//inst[0xD6] = &CPU::SUB; inst[0xDE] = &CPU::SBC;
-	//inst[0xE6] = &CPU::AND; inst[0xEE] = &CPU::XOR;
-	//inst[0xF6] = &CPU::OR; inst[0xFE] = &CPU::CP;
-
-	////// 16 bit Arithmetic
-	//for (word i = 0x03; i < 0x3C; i += 0x10) { inst[i] = &CPU::INC16; }
-	//for (word i = 0x09; i < 0x3A; i += 0x10) { inst[i] = &CPU::ADD16; }
-	//for (word i = 0x0B; i < 0x3C; i += 0x10) { inst[i] = &CPU::DEC16; }
-	//inst[0xE8] = &CPU::ADD16;
-
-	//// Bit manipulation
-	//inst[0x7] = &CPU::RLCA; inst[0xF] = &CPU::RRCA;
-	//inst[0x17] = &CPU::RLA; inst[0x1F] = &CPU::RRA;
-
-	//// CB Instructions
-	//for (word i = 0x00; i < 0x08; i++) { CBInst[i] = &CPU::RLC; }
-	//for (word i = 0x08; i < 0x10; i++) { CBInst[i] = &CPU::RRC; }
-	//for (word i = 0x10; i < 0x18; i++) { CBInst[i] = &CPU::RL; }
-	//for (word i = 0x18; i < 0x20; i++) { CBInst[i] = &CPU::RR; }
-	//for (word i = 0x20; i < 0x28; i++) { CBInst[i] = &CPU::SLA; }
-	//for (word i = 0x28; i < 0x30; i++) { CBInst[i] = &CPU::SRA; }
-	//for (word i = 0x30; i < 0x38; i++) { CBInst[i] = &CPU::SWAP; }
-	//for (word i = 0x38; i < 0x40; i++) { CBInst[i] = &CPU::SRL; }
-	//for (word i = 0x40; i < 0x80; i++) { CBInst[i] = &CPU::BIT; }
-	//for (word i = 0x80; i < 0xC0; i++) { CBInst[i] = &CPU::RES; }
-	//for (word i = 0xC0; i < 0x100; i++) { CBInst[i] = &CPU::SET; }
+// Prefix for CB instructions
+byte CPU::PREF(byte ins) {
+	if (ins == 0) printf("PREF");
+	return 4;
 }

@@ -8,6 +8,6 @@ class DMG{
 public:
 	DMG();
 
-	CPU cpu;
-	static Memory ram;
+	CPU* cpu;
+	Memory ram;
 };
