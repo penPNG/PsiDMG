@@ -168,6 +168,7 @@ private:
 	// CB Instructions
 	byte RLC(reg8);			// Rotate Register Left with Carry
 	byte RLCM(word);		// Rotate Memory Left with Carry
+
 	byte RRC(reg8);			// Rotate Register Right with Carry
 	byte RRCM(word);		// Rotate Memory Right with Carry
 
@@ -186,19 +187,17 @@ private:
 	byte SWAP(reg8);		// Swap Hi and Lo Bits of Register
 	byte SWPM(word);		// Swap Hi and Lo Bits of Memory
 
-	byte SRL(reg8);			// Shift Register Right (reset bit 0)
-	byte SRLM(word);		// Shift Memory Right (reset bit 0)
+	byte SRL(reg8);			// Shift Register Right (reset bit 7)
+	byte SRLM(word);		// Shift Memory Right (reset bit 7)
 
 	byte BIT(byte, reg8);	// Copy Bit from Register to Z Flag
 	byte BITM(byte, word);	// Copy Bit from Memory to Z Flag
 
 	byte RES(byte, reg8);	// Reset Bit in Register
-	byte RES(byte, word);	// Reset Bit in Memory
+	byte RESM(byte, word);	// Reset Bit in Memory
 
 	byte SET(byte, reg8);	// Set Bit in Register
 	byte SETM(byte, word);	// Set Bit in Memory
-
-	void no(word);
 
 private:
 

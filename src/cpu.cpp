@@ -912,39 +912,260 @@ byte CPU::RETI() {
 	IME = 1;
 	return 8;
 }
+// -----------
 
-byte CPU::no(word op) { printf("NOP"); }
+// Bit Manipulation
+// ----------------
 
-//Bit Manipulation
-byte CPU::RLCA(word op) { printf("RLCA"); }
+// Rotate A Left with Carry
+byte CPU::RLCA() {
+	byte a;
+	printf("RLCA: %x", a = get8(A));
+	setZ(a == 0); setN(0); setH(0);
+	setC(a & 0x80);
+	set8(A, (a << 1) | (a >> 7));
+	return 4;
+}
 
-byte CPU::RLA(word op) { printf("RLA"); }
+// Rotate A Left through Carry
+byte CPU::RLA() { 
+	byte a; bool c;
+	printf("RLA: %x %d", a = get8(A), c = getC());
+	setZ(a == 0); setN(0); setH(0);
+	setC(a & 0x80);
+	set8(A, (a << 1) | c);
+	return 4;
+}
 
-byte CPU::RRCA(word op) {printf("RRCA"); }
+// Rotate A Right with Carry
+byte CPU::RRCA() {
+	byte a;
+	printf("RRCA: %x", a = get8(A));
+	setZ(a == 0); setN(0); setH(0);
+	setC(a & 0x01);
+	set8(A, (a >> 1) | (a << 7));
+	return 4;
+}
 
-byte CPU::RRA(word op) {printf("RRA"); }
+// Rotate A Right through Carry
+byte CPU::RRA() {
+	byte a; bool c;
+	printf("RRA: %x %d", a = get8(A), c = getC());
+	setZ(a == 0); setN(0); setH(0);
+	setC(a & 0x01);
+	set8(A, (a >> 1) | (c << 7));
+	return 4;
+}
+// ----------------
 
 // CB Instructions
-byte CPU::RLC(word op) { printf("RLC"); }
+// ---------------
 
-byte CPU::RRC(word op) { printf("RRC"); }
+// Rotate Register Left with Carry
+byte CPU::RLC(reg8 reg) { 
+	byte n;
+	printf("RLC: %x", n = get8(reg));
+	setZ(n == 0); setN(0); setH(0);
+	setC(n & 0x80);
+	set8(reg, (n << 1) | (n >> 7));
+	return 8;
+}
 
-byte CPU::RL(word op) { printf("RL"); }
+// Rotate Memory Left with Carry
+byte CPU::RLCM(word addr) {
+	byte n;
+	printf("RLCM: %x", n = getRam(addr));
+	setZ(n == 0); setN(0); setH(0);
+	setC(n & 0x80);
+	setRam(addr, (n << 1) | (n >> 7));
+	return 16;
+}
 
-byte CPU::RR(word op) { printf("RR"); }
+// Rotate Register Right with Carry
+byte CPU::RRC(reg8 reg) {
+	byte n;
+	printf("RRC: %x", n = get8(reg));
+	setZ(n == 0); setN(0); setH(0);
+	setC(n & 0x01);
+	set8(reg, (n >> 1) | (n << 7));
+	return 8;
+}
 
-byte CPU::SLA(word op) { printf("SLA"); }
+// Rotate Memory Right with Carry
+byte CPU::RRCM(word addr) {
+	byte n;
+	printf("RRCM: %x", n = getRam(addr));
+	setZ(n == 0); setN(0); setH(0);
+	setC(n & 0x01);
+	setRam(addr, (n >> 1) | (n << 7));
+	return 16;
+}
 
-byte CPU::SRA(word op) { printf("SRA"); }
+// Rotate Register Left through Carry
+byte CPU::RL(reg8 reg) {
+	byte n; bool c;
+	printf("RL: %x %d", n = get8(reg), c = getC());
+	setZ(n == 0); setN(0); setH(0);
+	setC(n & 0x80);
+	set8(reg, (n << 1) | c);
+	return 8;
+}
 
-byte CPU::SWAP(word op) { printf("SWAP"); }
+// Rotate Memory Left through Carry
+byte CPU::RLM(word addr) {
+	byte n; bool c;
+	printf("RLM: %x %d", n = getRam(addr), c = getC());
+	setZ(n == 0); setN(0); setH(0);
+	setC(n & 0x80);
+	setRam(addr, (n << 1) | c);
+	return 16;
+}
 
-byte CPU::SRL(word op) { printf("SRL"); }
+// Rotate Register Right through Carry
+byte CPU::RR(reg8 reg) {
+	byte n; bool c;
+	printf("RL: %x %d", n = get8(reg), c = getC());
+	setZ(n == 0); setN(0); setH(0);
+	setC(n & 0x01);
+	set8(reg, (n >> 1) | (c << 7));
+	return 8;
+}
 
-byte CPU::BIT(word op) { printf("BIT"); }
+// Rotate Memory Right through Carry
+byte CPU::RRM(word addr) {
+	byte n; bool c;
+	printf("RLM: %x %d", n = getRam(addr), c = getC());
+	setZ(n == 0); setN(0); setH(0);
+	setC(n & 0x01);
+	setRam(addr, (n >> 1) | (c << 7));
+	return 16;
+}
 
-byte CPU::RES(word op) { printf("RES"); }
+// Shift Register Left (Reset Bit 0)
+byte CPU::SLA(reg8 reg) {
+	byte n;
+	printf("SLA: %x", n = get8(reg));
+	setZ(n == 0); setN(0); setH(0);
+	setC(n & 0x80);
+	set8(reg, n << 1);
+	return 8;
+}
 
-byte CPU::SET(word op) { printf("SET"); }
+// Shift Memory Left (Reset Bit 0)
+byte CPU::SLAM(word addr) {
+	byte n;
+	printf("SLAM: %x", n = getRam(addr));
+	setZ(n == 0); setN(0); setH(0);
+	setC(n & 0x80);
+	setRam(addr, n << 1);
+	return 16;
+}
 
+// Shift Register Right
+byte CPU::SRA(reg8 reg) {
+	byte n;
+	printf("SRA: %x", n = get8(reg));
+	setZ(n == 0); setN(0); setH(0);
+	setC(n & 0x01);
+	set8(reg, (n << 1) | (n & 0x80));
+	return 8;
+}
+
+// Shift Memory Right
+byte CPU::SRAM(word addr) {
+	byte n;
+	printf("SRAM: %x", n = getRam(addr));
+	setZ(n == 0); setN(0); setH(0);
+	setC(n & 0x01);
+	setRam(addr, (n >> 1) | (n & 0x80));
+	return 16;
+}
+
+// Shift Register Right (Reset Bit 7)
+byte CPU::SRL(reg8 reg) {
+	byte n;
+	printf("SRL: %x", n = get8(reg));
+	setZ(n == 0); setN(0); setH(0);
+	setC(n & 0x01);
+	set8(reg, n << 1);
+	return 8;
+}
+
+// Shift Memory Right (Reset Bit 7)
+byte CPU::SRLM(word addr) {
+	byte n;
+	printf("SRLM: %x", n = getRam(addr));
+	setZ(n == 0); setN(0); setH(0);
+	setC(n & 0x01);
+	setRam(addr, n >> 1);
+	return 16;
+}
+
+// Swap Hi and Lo Bits of Register
+byte CPU::SWAP(reg8 reg) {
+	byte n;
+	printf("SWAP: %x", n = get8(reg));
+	setZ(n == 0); setN(0); setH(0); setC(0);
+	set8(reg, (n >> 4) | (n << 4));
+	return 8;
+}
+
+// Swap Hi and Lo Bits of Memory
+byte CPU::SWPM(word addr) {
+	byte n;
+	printf("SWPM: %x", n = getRam(addr));
+	setZ(n == 0); setN(0); setH(0); setC(0);
+	setRam(addr, (n >> 4) | (n << 4));
+	return 16;
+}
+
+// Copy Bit from Register to Z Flag
+byte CPU::BIT(byte b, reg8 reg) {
+	byte n;
+	printf("BIT: %d %x", b, n = get8(reg));
+	setN(0); setH(1);
+	setZ(!(n & (1 << b)));
+	return 8;
+}
+
+// Copy Bit from Memory to Z Flag
+byte CPU::BITM(byte b, word addr) {
+	byte n;
+	printf("BIT: %d %x", b, n = getRam(addr));
+	setN(0); setH(1);
+	setZ(!(n & (1 << b)));
+	return 16;
+}
+
+// Reset Bit in Register
+byte CPU::RES(byte b, reg8 reg) {
+	byte n;
+	printf("RES: %d %x", b, n = get8(reg));
+	set8(reg, n & ~(1 << b));
+	return 8;
+}
+
+// Reset Bit in Memory
+byte CPU::RESM(byte b, word addr) {
+	byte n;
+	printf("RES: %d %x", b, n = getRam(addr));
+	setRam(addr, n & ~(1 << b));
+	return 16;
+}
+
+// Set Bit in Register
+byte CPU::SET(byte b, reg8 reg) {
+	byte n;
+	printf("RES: %d %x", b, n = get8(reg));
+	set8(reg, n | (1 << b));
+	return 8;
+}
+
+// Set Bit in Memory
+byte CPU::SETM(byte b, word addr) {
+	byte n;
+	printf("RES: %d %x", b, n = getRam(addr));
+	setRam(addr, n | (1 << b));
+	return 16;
+}
 // ------------
