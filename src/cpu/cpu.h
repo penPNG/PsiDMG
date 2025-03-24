@@ -1,7 +1,7 @@
 #pragma once
-#include "ds.h"
+#include "../core/ds.h"
 #include <stdio.h>
-#include "memory.h"
+#include "../memory/memory.h"
 #include <cstddef>
 
 // Flags

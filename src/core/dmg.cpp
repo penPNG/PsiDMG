@@ -25,3 +25,13 @@ DMG::DMG() {
 	cpu->exec(0x40);
 	printf("\nResult: %X", cpu->get8(A));
 }
+
+void DMG::loop() {
+	static constexpr int cycles = 69920;
+	int oCycles = 0;
+	int frame = 0;
+
+	while (!quit) {
+		//cpu->exec(ram.getRam(cpu->PC++));
+	}
+}

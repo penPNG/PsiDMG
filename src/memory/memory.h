@@ -1,5 +1,5 @@
 #pragma once
-#include "ds.h"
+#include "../core/ds.h"
 
 class Memory {
 public:
