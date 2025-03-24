@@ -214,6 +214,6 @@ private:
 private:
 
 	Memory& ram;
-	word op;
+	//word op;
 
 };
