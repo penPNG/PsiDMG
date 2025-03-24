@@ -5,7 +5,7 @@
 
 // Load standard
 byte CPU::LD(reg8 x, reg8 y) {
-	printf("LDH: %d %d", x, y);
+	printf("LD: %d %d", x, y);
 
 	set8(x, get8(y));
 	return 4;
@@ -41,6 +41,34 @@ byte CPU::LDMR(word addr, reg8 reg) {
 
 	ram.ram[addr] = get8(reg);
 	return 8;
+}
+
+// Load A to Relative Memory
+byte CPU::LDMA(byte n) {
+	printf("LDAM: %d %d", get8(A), n);
+	ram.ram[0xFF00 + n] = get8(A);
+	return 12;
+}
+
+// Load Relative Memory to A
+byte CPU::LDAM(byte n) {
+	printf("LDMA: %d %d", get8(A), n);
+	set8(A, ram.ram[0xFF00 + n]);
+	return 12;
+}
+
+// Load A to Immediate Memory
+byte CPU::LDIA(word addr) {
+	printf("LDIA: %d %d", get8(A), addr);
+	ram.ram[addr] = get8(A);
+	return 16;
+}
+
+// Load Immediate Memory to A
+byte CPU::LDAI(word addr) {
+	printf("LDAI: %d %d", get8(A), addr);
+	set8(A, ram.ram[addr]);
+	return 16;
 }
 
 // Load 16 Bit Immediate
@@ -573,7 +601,7 @@ byte CPU::EI() {
 byte CPU::JR(sbyte n) {
 	printf("JR: %d", n);
 	PC += n;
-	return 8;
+	return 12;
 }
 
 // Jump the value of the Signed Byte if Flag is set
@@ -585,7 +613,7 @@ byte CPU::JRS(flag f, sbyte n) {
 		default: F = 0; break;
 	}
 	printf("JRS: %d %d", F, n);
-	if (F) { PC += n; }
+	if (F) { PC += n; return 12; }
 	return 8;
 }
 
@@ -598,7 +626,7 @@ byte CPU::JRN(flag f, sbyte n) {
 		default: F = 0; break;
 	}
 	printf("JRN: %d %d", F, n);
-	if (!F) { PC += n; }
+	if (!F) { PC += n; return 12; }
 	return 8;
 }
 
@@ -625,8 +653,8 @@ byte CPU::JPS(flag f, word addr) {
 		default: F = 0; break;
 	}
 	printf("JPS: %d %X", F, addr);
-	if (F) { PC = addr; }
-	return 8;
+	if (F) { PC = addr; return 16; }
+	return 12;
 }
 
 // Jump to given Address if Flag is not set
@@ -638,8 +666,8 @@ byte CPU::JPN(flag f, word addr) {
 		default: F = 0; break;
 	}
 	printf("JPN: %d %X", F, addr);
-	if (!F) { PC = addr; }
-	return 8;
+	if (!F) { PC = addr; return 16; }
+	return 12;
 }
 
 // Call given Address
@@ -647,7 +675,7 @@ byte CPU::CALL(word addr) {
 	printf("CALL: %X", addr);
 	push(PC);
 	PC = addr;
-	return 12;
+	return 24;
 }
 
 // Call given Address if Flag is set
@@ -659,7 +687,7 @@ byte CPU::CLLS(flag f, word addr) {
 		default: F = 0; break;
 	}
 	printf("CALL: %d %X", F, addr);
-	if (F) { push(PC); PC = addr; }
+	if (F) { push(PC); PC = addr; return 24; }
 	return 12;
 }
 
@@ -672,7 +700,7 @@ byte CPU::CLLN(flag f, word addr) {
 		default: F = 0; break;
 	}
 	printf("CALL: %d %X", F, addr);
-	if (!F) { push(PC); PC = addr; }
+	if (!F) { push(PC); PC = addr; return 24; }
 	return 12;
 }
 
@@ -681,14 +709,14 @@ byte CPU::RST(byte n) {
 	printf("RST: %X", n);
 	push(PC);
 	PC = n;
-	return 32;
+	return 16;
 }
 
 // Pop Stack to PC
 byte CPU::RET() {
 	printf("RET: %X", PC);
 	PC = pop();
-	return 8;
+	return 16;
 }
 
 // Pop Stack to PC if Flag is set
@@ -700,7 +728,7 @@ byte CPU::RTS(flag f) {
 		default: F = 0; break;
 	}
 	printf("RTS: %d %X", F, PC);
-	if (F) { PC = pop(); }
+	if (F) { PC = pop(); return 20; }
 	return 8;
 }
 
@@ -713,7 +741,7 @@ byte CPU::RTN(flag f) {
 		default: F = 0; break;
 	}
 	printf("RTN: %d %X", F, PC);
-	if (!F) { PC = pop(); }
+	if (!F) { PC = pop(); return 20; }
 	return 8;
 }
 
@@ -722,7 +750,7 @@ byte CPU::RETI() {
 	printf("RETI: %X", PC);
 	PC = pop();
 	IME = 1;
-	return 8;
+	return 16;
 }
 // -----------
 

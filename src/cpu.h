@@ -14,7 +14,7 @@ class CPU {
 public:
 	CPU(Memory&);
 
-	void exec(byte);
+	byte exec(byte);
 
 	// Regiseter Functions
 	// -------------------
@@ -52,21 +52,45 @@ public:
 
 private:
 	// Load
-	byte LD(reg8, reg8);		// Load standard
-	byte LDI(reg8, byte);		// Load Immediate to Register
-	byte LDMI(word, byte);		// Load Immediate to Memory
-	byte LDRM(reg8, word);		// Load to Register from Memory
-	byte LDMR(word, reg8);		// Load to Memory from Register
+	// ----
 
-	byte LD16(reg16, word);		// Load 16 Bit Immediate
-	byte LD16SPHL();			// Load to SP from HL
-	byte LD16HLSP(sbyte);		// Load to HL from SP + Signed Byte
-	byte LD16MSP(word);			// LOAD to Memory from SP
+	// Load standard
+	byte LD(reg8, reg8);
+	// Load Immediate to Register
+	byte LDI(reg8, byte);
+	// Load Immediate to Memory
+	byte LDMI(word, byte);
+	// Load to Register from Memory
+	byte LDRM(reg8, word);
+	// Load to Memory from Register
+	byte LDMR(word, reg8);
+	// Load A to Relatve Memory
+	byte LDMA(byte);
+	// Load Relative Memory to A
+	byte LDAM(byte);
+	// Load A to Immediate Memory
+	byte LDIA(word);
+	// Load Immediate Memory to A
+	byte LDAI(word);
+
+	// Load 16 Bit Immediate
+	byte LD16(reg16, word);
+	// Load to SP from HL
+	byte LD16SPHL();
+	// Load to HL from SP + Signed Byte
+	byte LD16HLSP(sbyte);
+	// LOAD to Memory from SP
+	byte LD16MSP(word);
 	
-	byte POP(reg16);			// POP Stack to 16 Bit Register
-	byte PUSH(reg16);			// Push 16 Bit Register to Stack
+	// POP Stack to 16 Bit Register
+	byte POP(reg16);
+	// Push 16 Bit Register to Stack
+	byte PUSH(reg16);
+	// ----
 
 	// Arithmetic
+	// ----------
+
 	byte ADD(reg8);		// ADD Register to A
 	byte ADDM(word);	// ADD Memory to A
 	byte ADDI(byte);	// ADD Immediate to A
@@ -114,8 +138,10 @@ private:
 	byte CCF();		// Flip Carry Flag
 	byte DAA();		// Adjust BCD of register A
 	byte SCF();		// Set Carry Flag
+	// ----------
 
 	// Control
+	// -------
 	byte NOP();		// Advance PC by one
 	byte STOP();	// Stop the clock... chaos ensues
 	byte HALT();	// A special tool we're saving for later
@@ -142,6 +168,7 @@ private:
 	byte RTS(flag);			// Pop Stack to PC if Flag is set
 	byte RTN(flag);			// Pop Stack to PC if FLag is not set
 	byte RETI();		// Return with interupts
+	// -------
 
 	// Bit Manipulation
 	byte RLCA();		// Rotate Register A Left with Carry
