@@ -1,4 +1,5 @@
 #include "core/dmg.h"
+#include "core/context.h"
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_sdl3.h"
 #include "imgui/imgui_impl_sdlrenderer3.h"
@@ -66,6 +67,7 @@ int main(char* argv) {
 		ImGui_ImplSDLRenderer3_NewFrame();
 		ImGui_ImplSDL3_NewFrame();
 		ImGui::NewFrame();
+		Context::showDMGDebugger(dmg);
 
 		if(show_demo_window)
 			ImGui::ShowDemoWindow(&show_demo_window); {
