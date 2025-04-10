@@ -67,8 +67,9 @@ int main(char* argv) {
 		ImGui_ImplSDL3_NewFrame();
 		ImGui::NewFrame();
 		Context::showDMGDebugger(dmg);
+		ImGui::ShowDemoWindow(&show_demo_window);
 
-		if(show_demo_window)
+		/*if(show_demo_window)
 			ImGui::ShowDemoWindow(&show_demo_window); {
 			static float f = 0.0f;
 			static int counter = 0;
@@ -88,15 +89,15 @@ int main(char* argv) {
 
 			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.f / io.Framerate, io.Framerate);
 			ImGui::End();
-		}
+		}*/
 
-		if (show_another_window) {
+		/*if (show_another_window) {
 			ImGui::Begin("Another Window", &show_another_window);
 			ImGui::Text("Hello from another window!");
 			if (ImGui::Button("Close Me"))
 				show_another_window = false;
 			ImGui::End();
-		}
+		}*/
 
 		ImGui::Render();
 		SDL_SetRenderDrawColorFloat(renderer, clear_color.x, clear_color.y, clear_color.z, clear_color.w);
