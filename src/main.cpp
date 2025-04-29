@@ -17,7 +17,7 @@ int main(char* argv) {
 	}
 
 	Uint32 window_flags = SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIDDEN;
-	SDL_Window* window = SDL_CreateWindow("Dear Imgui SDL3+SDL_Renderer example", 1280, 720, window_flags);
+	SDL_Window* window = SDL_CreateWindow("psiDMG", 1280, 720, window_flags);
 	if (window == NULL) {
 		printf("Error: SDL_CreateWindow(): %s\n", SDL_GetError());
 		return -1;
@@ -41,7 +41,7 @@ int main(char* argv) {
 	ImGui_ImplSDL3_InitForSDLRenderer(window, renderer);
 	ImGui_ImplSDLRenderer3_Init(renderer);
 
-	Context* context = new Context(1280, 720, dmg);
+	//Context* context = new Context(1280, 720, dmg);
 
 
 	// State
