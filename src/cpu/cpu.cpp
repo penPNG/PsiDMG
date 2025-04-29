@@ -61,25 +61,25 @@ void CPU::setC(bool c) { if (c) { set8(F, flagC); } else { registers.reg8[F] &= 
 // TODO make safer functions!
 
 // Get Ram from Address
-byte CPU::getRam(word addr) {
-	return ram.ram[addr];
+byte CPU::readMem(word addr) {
+	return ram.readMem(addr);
 }
 
 // Set Ram at Address
-void CPU::setRam(word addr, byte data) {
+void CPU::writeMem(word addr, byte data) {
 	ram.ram[addr] = data;
 }
 
 // Push Word to Stack
 void CPU::push(word w) {
-	setRam(--registers.reg16[SP], w & (0xFF00 >> 8));
-	setRam(--registers.reg16[SP], w & 0x00FF);
+	writeMem(--registers.reg16[SP], w & (0xFF00 >> 8));
+	writeMem(--registers.reg16[SP], w & 0x00FF);
 }
 
 // Pop Word from Stack
 word CPU::pop() {
-	word w = getRam(registers.reg16[SP]++);
-	w |= getRam(registers.reg16[SP]++) << 8;
+	word w = readMem(registers.reg16[SP]++);
+	w |= readMem(registers.reg16[SP]++) << 8;
 	return w;
 }
 

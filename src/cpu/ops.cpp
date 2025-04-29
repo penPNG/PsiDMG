@@ -23,7 +23,7 @@ byte CPU::LDI(reg8 reg, byte b) {
 byte CPU::LDMI(word addr, byte b) {
 	printf("LDMI: %d %d", addr, b);
 
-	setRam(addr, b);
+	writeMem(addr, b);
 	return 12;
 }
 
@@ -31,7 +31,7 @@ byte CPU::LDMI(word addr, byte b) {
 byte CPU::LDRM(reg8 reg, word addr) {
 	printf("LDRM: %d %d", reg, addr);
 
-	set8(reg, ram.ram[addr]);
+	set8(reg, readMem(addr));
 	return 8;
 }
 
@@ -39,35 +39,35 @@ byte CPU::LDRM(reg8 reg, word addr) {
 byte CPU::LDMR(word addr, reg8 reg) {
 	printf("LDMR: %d %d", addr, reg);
 
-	ram.ram[addr] = get8(reg);
+	writeMem(addr, get8(reg));
 	return 8;
 }
 
 // Load A to Relative Memory
 byte CPU::LDMA(byte n) {
 	printf("LDAM: %d %d", get8(A), n);
-	ram.ram[0xFF00 + n] = get8(A);
+	writeMem(0xFF00 + n, get8(A));
 	return 12;
 }
 
 // Load Relative Memory to A
 byte CPU::LDAM(byte n) {
 	printf("LDMA: %d %d", get8(A), n);
-	set8(A, ram.ram[0xFF00 + n]);
+	set8(A, readMem(0xFF00 + n));
 	return 12;
 }
 
 // Load A to Immediate Memory
 byte CPU::LDIA(word addr) {
 	printf("LDIA: %d %d", get8(A), addr);
-	ram.ram[addr] = get8(A);
+	writeMem(addr, get8(A));
 	return 16;
 }
 
 // Load Immediate Memory to A
 byte CPU::LDAI(word addr) {
 	printf("LDAI: %d %d", get8(A), addr);
-	set8(A, ram.ram[addr]);
+	set8(A, readMem(addr));
 	return 16;
 }
 
@@ -105,8 +105,8 @@ byte CPU::LD16HLSP(sbyte sb) {
 byte CPU::LD16MSP(word addr) {
 	printf("LD16HLSP: %d %d", addr, get16(SP));
 
-	ram.ram[addr] = get16(SP) & 0x00FF;
-	ram.ram[addr + 1] = get16(SP) & (0xFF00 >> 8);
+	writeMem(addr, get16(SP) & 0x00FF);
+	writeMem(addr + 1, get16(SP) & (0xFF00 >> 8));
 	return 20;
 }
 
@@ -114,7 +114,7 @@ byte CPU::LD16MSP(word addr) {
 byte CPU::POP(reg16 reg) {
 	printf("POP: %d", reg);
 
-	set16(reg, ram.ram[registers.reg16[SP]++] | (ram.ram[registers.reg16[SP]++] << 8));
+	set16(reg, readMem(registers.reg16[SP]++) | (readMem(registers.reg16[SP]++) << 8));
 	return 12;
 }
 
@@ -122,8 +122,8 @@ byte CPU::POP(reg16 reg) {
 byte CPU::PUSH(reg16 reg) {
 	printf("PUSH: %d", reg);
 
-	setRam(--registers.reg16[SP], get16(reg) & (0xFF00 >> 8));
-	setRam(--registers.reg16[SP], get16(reg) & 0x00FF);
+	writeMem(--registers.reg16[SP], get16(reg) & (0xFF00 >> 8));
+	writeMem(--registers.reg16[SP], get16(reg) & 0x00FF);
 	return 16;
 }
 // ------------
@@ -147,7 +147,7 @@ byte CPU::ADD(reg8 reg) {
 // ADD Memory to A
 byte CPU::ADDM(word addr) {
 	byte n, a;
-	printf("ADDM: %d %d", a = get8(A), n = getRam(addr));
+	printf("ADDM: %d %d", a = get8(A), n = readMem(addr));
 
 	word res = a + n;
 	setZ(res == 0); setN(0);
@@ -186,7 +186,7 @@ byte CPU::ADC(reg8 reg) {
 // ADD with Carry emory to A
 byte CPU::ADCM(word addr) {
 	byte a, n; bool c;
-	printf("ADCM: %d %d %d", a = get8(A), n = getRam(addr), c = getC());
+	printf("ADCM: %d %d %d", a = get8(A), n = readMem(addr), c = getC());
 
 	word res = c ? a + n + 1 : a + n;
 	setZ(res == 0); setN(0);
@@ -251,7 +251,7 @@ byte CPU::SUB(reg8 reg) {
 // SUB Memory from A
 byte CPU::SUBM(word addr) {
 	byte a, n;
-	printf("SUB: %d %d", a = get8(A), n = getRam(addr));
+	printf("SUB: %d %d", a = get8(A), n = readMem(addr));
 
 	word res = a - n;
 	setZ(res == 0); setN(1);
@@ -290,7 +290,7 @@ byte CPU::SBC(reg8 reg) {
 // SUB with Carry Memory from A
 byte CPU::SBCM(word addr) {
 	byte a, n; bool c;
-	printf("SBCM: %d %d %d", a = get8(A), n = getRam(addr), c = getC());
+	printf("SBCM: %d %d %d", a = get8(A), n = readMem(addr), c = getC());
 
 	word res = c ? a - (n + 1) : a - n;
 	setZ(res == 0); setN(1);
@@ -328,7 +328,7 @@ byte CPU::AND(reg8 reg) {
 // AND Memory with A
 byte CPU::ANDM(word addr) {
 	byte n, a;
-	printf("ANDM: %d %d", a = get8(A), n = getRam(addr));
+	printf("ANDM: %d %d", a = get8(A), n = readMem(addr));
 
 	byte res = a & n;
 	setZ(res == 0); setN(0);
@@ -364,7 +364,7 @@ byte CPU::XOR(reg8 reg) {
 // XOR Memory with A
 byte CPU::XORM(word addr) {
 	byte n, a;
-	printf("XORM: %d %d", a = get8(A), n = getRam(addr));
+	printf("XORM: %d %d", a = get8(A), n = readMem(addr));
 
 	byte res = a ^ n;
 	setZ(res == 0); setN(0);
@@ -400,7 +400,7 @@ byte CPU::OR(reg8 reg) {
 // OR Memory with A
 byte CPU::ORM(word addr) {
 	byte n, a;
-	printf("ADDM: %d %d", a = get8(A), n = getRam(addr));
+	printf("ADDM: %d %d", a = get8(A), n = readMem(addr));
 
 	byte res = a | n;
 	setZ(res == 0); setN(0);
@@ -436,7 +436,7 @@ byte CPU::CP(reg8 reg) {
 // Compare Memory with A for equality
 byte CPU::CPM(word addr) {
 	byte a, n;
-	printf("CPM: %d %d", a = get8(A), n = getRam(addr));
+	printf("CPM: %d %d", a = get8(A), n = readMem(addr));
 
 	word res = a - n;
 	setZ(res == 0); setN(1);
@@ -471,11 +471,11 @@ byte CPU::INC(reg8 reg) {
 // Increment Memory
 byte CPU::INCM(word addr) {
 	byte a;
-	printf("INC: %d", a = getRam(addr));
+	printf("INC: %d", a = readMem(addr));
 
 	setZ(a + 1 == 0); setN(0);
 	setH(((a & 0x0F) + 1) & 0x10);
-	setRam(addr, a + 1);
+	writeMem(addr, a + 1);
 	return 12;
 }
 
@@ -502,11 +502,11 @@ byte CPU::DEC(reg8 reg) {
 // Decrement Memory
 byte CPU::DECM(word addr) {
 	byte a;
-	printf("INC: %d", a = getRam(addr));
+	printf("INC: %d", a = readMem(addr));
 
 	setZ(a - 1 == 0); setN(1);
 	setH((a & 0x0F) == 0x00);
-	setRam(addr, a - 1);
+	writeMem(addr, a - 1);
 	return 12;
 }
 
@@ -814,10 +814,10 @@ byte CPU::RLC(reg8 reg) {
 // Rotate Memory Left with Carry
 byte CPU::RLCM(word addr) {
 	byte n;
-	printf("RLCM: %x", n = getRam(addr));
+	printf("RLCM: %x", n = readMem(addr));
 	setZ(n == 0); setN(0); setH(0);
 	setC(n & 0x80);
-	setRam(addr, (n << 1) | (n >> 7));
+	writeMem(addr, (n << 1) | (n >> 7));
 	return 16;
 }
 
@@ -834,10 +834,10 @@ byte CPU::RRC(reg8 reg) {
 // Rotate Memory Right with Carry
 byte CPU::RRCM(word addr) {
 	byte n;
-	printf("RRCM: %x", n = getRam(addr));
+	printf("RRCM: %x", n = readMem(addr));
 	setZ(n == 0); setN(0); setH(0);
 	setC(n & 0x01);
-	setRam(addr, (n >> 1) | (n << 7));
+	writeMem(addr, (n >> 1) | (n << 7));
 	return 16;
 }
 
@@ -854,10 +854,10 @@ byte CPU::RL(reg8 reg) {
 // Rotate Memory Left through Carry
 byte CPU::RLM(word addr) {
 	byte n; bool c;
-	printf("RLM: %x %d", n = getRam(addr), c = getC());
+	printf("RLM: %x %d", n = readMem(addr), c = getC());
 	setZ(n == 0); setN(0); setH(0);
 	setC(n & 0x80);
-	setRam(addr, (n << 1) | c);
+	writeMem(addr, (n << 1) | c);
 	return 16;
 }
 
@@ -874,10 +874,10 @@ byte CPU::RR(reg8 reg) {
 // Rotate Memory Right through Carry
 byte CPU::RRM(word addr) {
 	byte n; bool c;
-	printf("RLM: %x %d", n = getRam(addr), c = getC());
+	printf("RLM: %x %d", n = readMem(addr), c = getC());
 	setZ(n == 0); setN(0); setH(0);
 	setC(n & 0x01);
-	setRam(addr, (n >> 1) | (c << 7));
+	writeMem(addr, (n >> 1) | (c << 7));
 	return 16;
 }
 
@@ -894,10 +894,10 @@ byte CPU::SLA(reg8 reg) {
 // Shift Memory Left (Reset Bit 0)
 byte CPU::SLAM(word addr) {
 	byte n;
-	printf("SLAM: %x", n = getRam(addr));
+	printf("SLAM: %x", n = readMem(addr));
 	setZ(n == 0); setN(0); setH(0);
 	setC(n & 0x80);
-	setRam(addr, n << 1);
+	writeMem(addr, n << 1);
 	return 16;
 }
 
@@ -914,10 +914,10 @@ byte CPU::SRA(reg8 reg) {
 // Shift Memory Right
 byte CPU::SRAM(word addr) {
 	byte n;
-	printf("SRAM: %x", n = getRam(addr));
+	printf("SRAM: %x", n = readMem(addr));
 	setZ(n == 0); setN(0); setH(0);
 	setC(n & 0x01);
-	setRam(addr, (n >> 1) | (n & 0x80));
+	writeMem(addr, (n >> 1) | (n & 0x80));
 	return 16;
 }
 
@@ -934,10 +934,10 @@ byte CPU::SRL(reg8 reg) {
 // Shift Memory Right (Reset Bit 7)
 byte CPU::SRLM(word addr) {
 	byte n;
-	printf("SRLM: %x", n = getRam(addr));
+	printf("SRLM: %x", n = readMem(addr));
 	setZ(n == 0); setN(0); setH(0);
 	setC(n & 0x01);
-	setRam(addr, n >> 1);
+	writeMem(addr, n >> 1);
 	return 16;
 }
 
@@ -953,9 +953,9 @@ byte CPU::SWAP(reg8 reg) {
 // Swap Hi and Lo Bits of Memory
 byte CPU::SWPM(word addr) {
 	byte n;
-	printf("SWPM: %x", n = getRam(addr));
+	printf("SWPM: %x", n = readMem(addr));
 	setZ(n == 0); setN(0); setH(0); setC(0);
-	setRam(addr, (n >> 4) | (n << 4));
+	writeMem(addr, (n >> 4) | (n << 4));
 	return 16;
 }
 
@@ -971,7 +971,7 @@ byte CPU::BIT(byte b, reg8 reg) {
 // Copy Bit from Memory to Z Flag
 byte CPU::BITM(byte b, word addr) {
 	byte n;
-	printf("BIT: %d %x", b, n = getRam(addr));
+	printf("BIT: %d %x", b, n = readMem(addr));
 	setN(0); setH(1);
 	setZ(!(n & (1 << b)));
 	return 16;
@@ -988,8 +988,8 @@ byte CPU::RES(byte b, reg8 reg) {
 // Reset Bit in Memory
 byte CPU::RESM(byte b, word addr) {
 	byte n;
-	printf("RES: %d %x", b, n = getRam(addr));
-	setRam(addr, n & ~(1 << b));
+	printf("RES: %d %x", b, n = readMem(addr));
+	writeMem(addr, n & ~(1 << b));
 	return 16;
 }
 
@@ -1004,8 +1004,8 @@ byte CPU::SET(byte b, reg8 reg) {
 // Set Bit in Memory
 byte CPU::SETM(byte b, word addr) {
 	byte n;
-	printf("RES: %d %x", b, n = getRam(addr));
-	setRam(addr, n | (1 << b));
+	printf("RES: %d %x", b, n = readMem(addr));
+	writeMem(addr, n | (1 << b));
 	return 16;
 }
 // ------------

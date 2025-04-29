@@ -38,8 +38,8 @@ public:
 
 	// Ram Functions
 	// -------------
-	byte getRam(word);
-	void setRam(word, byte);
+	byte readMem(word);
+	void writeMem(word, byte);
 
 	void push(word);
 	word pop();

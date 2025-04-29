@@ -60,3 +60,9 @@ Memory::Memory() {
 		ram[i] = 0;
 	}
 }
+
+// Write to Ram
+void Memory::writeMem(word addr, byte data) {
+	// memory mapping and checking to come
+	ram[addr] = data;
+}
