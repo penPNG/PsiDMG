@@ -49,11 +49,13 @@ void Context::update() {
 	SDL_UnlockTexture(texture);
 	SDL_RenderClear(renderer);
 	SDL_RenderTexture(renderer, texture, NULL, NULL);
+	ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(), renderer);
 	SDL_RenderPresent(renderer);
 	SDL_LockTexture(texture, NULL, &texturePixels, &texturePitch);
 }
 
 
+// Windows
 void Context::showDMGDebugger(DMG* dmg) {
 	using namespace ImGui;
 	SetNextWindowSize(ImVec2(400, 300), ImGuiCond_FirstUseEver);

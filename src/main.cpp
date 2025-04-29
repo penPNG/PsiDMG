@@ -41,6 +41,8 @@ int main(char* argv) {
 	ImGui_ImplSDL3_InitForSDLRenderer(window, renderer);
 	ImGui_ImplSDLRenderer3_Init(renderer);
 
+	Context* context = new Context(1280, 720, dmg);
+
 
 	// State
 	bool show_demo_window = true;

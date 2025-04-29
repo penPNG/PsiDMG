@@ -23,6 +23,22 @@ enum reg8 {
 	S
 };
 
+enum class PPUState {
+	HBLANK,
+	VBLANK,
+	OAM,
+	VRAM,
+	NONE
+};
+
+enum class MBC {
+	NONE,
+	MBC1,
+	MBC2,
+	MBC3,
+	MBC5
+};
+
 enum reg16 {
 	AF,
 	BC,

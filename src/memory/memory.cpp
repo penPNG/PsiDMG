@@ -14,7 +14,11 @@
 // FF80	FFFE	High RAM(HRAM)
 // FFFF	FFFF	Interrupt Enable register (IE)
 
-Memory::Memory() {
+Memory::Memory():
+		ext_ram(0x2000),
+		vram(0x2000),
+		wram(0x2000),
+		hram(0x7F) {
 	ram[P1] = 0xCF;
 	ram[SB] = 0x00;
 	ram[SC] = 0x7E;
@@ -63,6 +67,42 @@ Memory::Memory() {
 
 // Write to Ram
 void Memory::writeMem(word addr, byte data) {
-	// memory mapping and checking to come
+	if (addr < 0x8000) {
+		// Inaccessible ROM
+		return;
+	}
+	else if (addr < 0xA000) {
+		// Video Ram
+		vram[addr - 0x8000] = data;
+	}
+	else if (addr < 0xFF00) {
+		if (addr < 0xC000) {
+			// External Ram
+			ext_ram[addr] = data;
+		}
+		else if (addr < 0xE000) {
+			// Work Ram
+			wram[addr - 0xC000] = data;
+		}
+		else if (addr < 0xFE00) {
+			// Echo of Work Ram
+			wram[addr - 0xE000] = data;
+		}
+		else if (addr < 0xFEA0) {
+			// OAM
+
+		}
+	}
+	else if (addr < 0xFF80) {
+		// IO Registers
+		// Do something special
+	}
+	else if (addr < 0xFFFF) {
+		// High Ram
+		hram[addr - 0xFF80] = data;
+	}
+	else {
+		// Interrupt Enable
+	}
 	ram[addr] = data;
 }
