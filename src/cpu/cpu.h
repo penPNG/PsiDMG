@@ -14,6 +14,13 @@ class CPU {
 public:
 	CPU(Memory&);
 
+	int runFor(int cycles) {
+		while (cycles > 0) {
+			cycles -= exec(ram.readMem(PC++));
+		}
+		return cycles;
+	}
+
 	byte exec(byte);
 
 	// Regiseter Functions
