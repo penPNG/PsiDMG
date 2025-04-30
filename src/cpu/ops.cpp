@@ -574,7 +574,11 @@ byte CPU::SCF() {
 byte CPU::NOP() { printf("NOP : 0"); return 4; }
 
 // Stop the clock... chaos ensues
-byte CPU::STOP() { printf("STOP"); return 4; }
+byte CPU::STOP() { 
+	printf("STOP");
+	ram.writeMem(0xFF00 & DIV, 0x00);
+	return 4; 
+}
 
 // A special tool we're saving for later
 byte CPU::HALT() { printf("HALT"); return 4; }

@@ -215,7 +215,7 @@ void Context::showDMGDebugger(DMG* dmg) {
 								}
 								else if (addr < 0xFF80) {
 									// IO Registers
-									InputScalar("##", ImGuiDataType_U8, &dmg->ram.ram[addr], NULL, NULL, "%02X");
+									InputScalar("##", ImGuiDataType_U8, &dmg->ram.io[addr&0xFF], NULL, NULL, "%02X");
 								}
 								else if (addr < 0xFFFF) {
 									// High Ram
