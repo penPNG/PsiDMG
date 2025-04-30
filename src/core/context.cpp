@@ -98,7 +98,7 @@ void Context::showDMGDebugger(DMG* dmg) {
 	SameLine(0, 10);
 	{
 		static int jumpAddr = 0x100;
-		static bool lockScroll = true;
+		static bool lockScroll = false;
 		static bool toScroll = false;
 		PushItemWidth(75);
 		if (lockScroll) {
@@ -210,7 +210,7 @@ void Context::showDMGDebugger(DMG* dmg) {
 									}
 									else if (addr < 0xFEA0) {
 										// OAM
-										InputScalar("##", ImGuiDataType_U8, &dmg->ram.ram[addr], NULL, NULL, "%02X");
+										InputScalar("##", ImGuiDataType_U8, &dmg->ram.oam[addr-0xFE00], NULL, NULL, "%02X");
 									}
 								}
 								else if (addr < 0xFF80) {

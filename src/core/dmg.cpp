@@ -26,6 +26,22 @@ DMG::DMG() {
 	//printf("\nResult: %X", cpu->get8(A));
 }
 
+DMG::DMG(const std::string &rom_path) {
+	std::ifstream rom_file(rom_path);
+	if (!rom_file) {
+		std::cerr << "Error: Could not open ROM file: " << rom_path << std::endl;
+		return;
+	}
+
+	const auto rom_size = std::filesystem::file_size(rom_path);
+	
+	std::vector<byte> rom_data(rom_size / sizeof(byte));
+	rom_file.read(reinterpret_cast<char*>(rom_data.data()), rom_size);
+	rom = rom_data;
+
+	cpu = new CPU(ram);
+}
+
 void DMG::loop() {
 	static constexpr int cycles = 69920;
 	int oCycles = 0;

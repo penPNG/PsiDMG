@@ -21,6 +21,9 @@ Memory::Memory() :
 		vram(0x2000),
 		wram(0x2000),
 		hram(0x7F) {
+	for (int i = 0; i < 0x100; i++) {
+		io[i] = 0xFF;
+	}
 	io[P1] = 0xCF;
 	io[SB] = 0x00;
 	io[SC] = 0x7E;
@@ -92,7 +95,7 @@ byte Memory::readMem(word addr) {
 		}
 		else if (addr < 0xFEA0) {
 			// OAM
-			return ram[addr];
+			return oam[addr-0xFE00];
 		}
 		else {
 			return 0xFF;
@@ -100,7 +103,7 @@ byte Memory::readMem(word addr) {
 	}
 	else if (addr < 0xFF80) {
 		// IO Registers
-		return ram[addr];
+		return readIO(addr);
 	}
 	else if (addr < 0xFFFF) {
 		// High Ram
@@ -159,7 +162,7 @@ byte Memory::readIO(word addr) {
 	byte ioAddr = addr & 0xFF;
 	switch (ioAddr) {
 		case P1: {
-			return io[P1] & 0xC0;
+			return io[P1] | 0xC0;
 		}
 		case SB: {
 			return io[SB];
