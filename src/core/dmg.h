@@ -10,6 +10,8 @@ public:
 
 	void loop();
 
+	//void loadRom(const char* rom);
+
 	CPU* cpu;
 	Memory ram;
 

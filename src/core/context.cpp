@@ -92,7 +92,7 @@ void Context::showDMGDebugger(DMG* dmg) {
 			"advancing the program counter");
 		SameLine(0, 10);
 		if (Button("Step", ImVec2(70, 0))) {
-			dmg->cpu->exec(dmg->ram.ram[dmg->cpu->PC++]);
+			dmg->cpu->exec(dmg->ram.readMem(dmg->cpu->PC++));
 		}
 	}
 	SameLine(0, 10);
@@ -139,6 +139,7 @@ void Context::showDMGDebugger(DMG* dmg) {
 			TableSetupColumn("XF", ImGuiTableColumnFlags_None, 0);
 			TableHeadersRow();
 
+			int addr = 0;
 			ImGuiListClipper clipper;
 			clipper.Begin(0x1000);
 			while (clipper.Step()) {
@@ -179,12 +180,51 @@ void Context::showDMGDebugger(DMG* dmg) {
 							Text("%03XX", row + column);
 						}
 						else {
+							addr = row * 16 + column - 1;
 							if (lockMem) {
-								Text("%02X", dmg->ram.ram[row * 16 + column - 1]);
+								Text("%02X", dmg->ram.readMem(addr));
+								//SDL_Log("0x%04X", addr);
 							}
 							else {
-								PushID(row * 16 + column - 1);
-								InputScalar("##", ImGuiDataType_U8, &dmg->ram.ram[row * 16 + column - 1], NULL, NULL, "%02X");
+								PushID(addr);
+								if (addr < 0x8000) {
+									// TODO: ROM Area
+									InputScalar("##", ImGuiDataType_U8, &dmg->ram.rom[addr], NULL, NULL, "%02X");
+								}
+								else if (addr < 0xA000) {
+									// Video Ram
+									InputScalar("##", ImGuiDataType_U8, &dmg->ram.vram[addr - 0x8000], NULL, NULL, "%02X");
+								}
+								else if (addr < 0xFF00) {
+									if (addr < 0xC000) {
+										// External Ram
+										InputScalar("##", ImGuiDataType_U8, &dmg->ram.ext_ram[addr - 0xA000], NULL, NULL, "%02X");
+									}
+									else if (addr < 0xE000) {
+										// Work Ram
+										InputScalar("##", ImGuiDataType_U8, &dmg->ram.wram[addr - 0xC000], NULL, NULL, "%02X");
+									}
+									else if (addr < 0xFE00) {
+										// Echo of Work Ram
+										InputScalar("##", ImGuiDataType_U8, &dmg->ram.wram[addr - 0xE000], NULL, NULL, "%02X");
+									}
+									else if (addr < 0xFEA0) {
+										// OAM
+										InputScalar("##", ImGuiDataType_U8, &dmg->ram.ram[addr], NULL, NULL, "%02X");
+									}
+								}
+								else if (addr < 0xFF80) {
+									// IO Registers
+									InputScalar("##", ImGuiDataType_U8, &dmg->ram.ram[addr], NULL, NULL, "%02X");
+								}
+								else if (addr < 0xFFFF) {
+									// High Ram
+									InputScalar("##", ImGuiDataType_U8, &dmg->ram.hram[addr - 0xFF80], NULL, NULL, "%02X");
+								}
+								else {
+									InputScalar("##", ImGuiDataType_U8, &dmg->ram.ram[addr], NULL, NULL, "%02X");
+								}
+								//InputScalar("##", ImGuiDataType_U8, &dmg->ram.ram[addr], NULL, NULL, "%02X");
 								PopID();
 							}
 						}

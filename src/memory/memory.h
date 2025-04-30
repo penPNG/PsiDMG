@@ -6,13 +6,13 @@ class Memory {
 public:
 	Memory();
 
-	// Get from Address
+	// Read from Ram
 	byte readMem(word addr);
 
 	// Write to Ram
 	void writeMem(word addr, byte data);
 
-	//std::vector<byte>& rom;
+	std::vector<byte> rom;
 	std::vector<byte> ext_ram;
 	std::vector<byte> vram;	// 8 KiB Video RAM
 	std::vector<byte> wram;	// 8 KiB Work RAM

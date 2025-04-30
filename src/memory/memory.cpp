@@ -15,6 +15,7 @@
 // FFFF	FFFF	Interrupt Enable register (IE)
 
 Memory::Memory():
+		rom(0x8000),
 		ext_ram(0x2000),
 		vram(0x2000),
 		wram(0x2000),
@@ -65,11 +66,52 @@ Memory::Memory():
 	}
 }
 
+// Read from Ram
+byte Memory::readMem(word addr) {
+	if (addr < 0x8000) {
+		// TODO: ROM Area
+		return rom[addr];
+	}
+	else if (addr < 0xA000) {
+		// Video Ram
+		return vram[addr - 0x8000];
+	}
+	else if (addr < 0xFF00) {
+		if (addr < 0xC000) {
+			// External Ram
+			return ext_ram[addr-0xA000];
+		}
+		else if (addr < 0xE000) {
+			// Work Ram
+			return wram[addr - 0xC000];
+		}
+		else if (addr < 0xFE00) {
+			// Echo of Work Ram
+			return wram[addr - 0xE000];
+		}
+		else if (addr < 0xFEA0) {
+			// OAM
+			return ram[addr];
+		}
+	}
+	else if (addr < 0xFF80) {
+		// IO Registers
+		return ram[addr];
+	}
+	else if (addr < 0xFFFF) {
+		// High Ram
+		return hram[addr - 0xFF80];
+	}
+	else {
+		return ram[addr];
+	}
+}
+
 // Write to Ram
 void Memory::writeMem(word addr, byte data) {
 	if (addr < 0x8000) {
 		// Inaccessible ROM
-		return;
+		rom[addr] = data;
 	}
 	else if (addr < 0xA000) {
 		// Video Ram
