@@ -9,7 +9,7 @@
 
 class Context {
 public:
-	Context(int _width, int _height, DMG*);
+	Context(int _width, int _height);
 	void update();
 
 //private:
@@ -21,8 +21,6 @@ private:
 	SDL_Texture* texture;
 
 	ImGuiIO& io;
-
-	DMG* dmg;
 
 	const int width;
 	const int height;

@@ -26,7 +26,7 @@ DMG::DMG() {
 	//printf("\nResult: %X", cpu->get8(A));
 }
 
-DMG::DMG(const std::string& _rom_path, Context& _context): context(_context) {
+DMG::DMG(const std::string& _rom_path) {
 	std::ifstream rom_file(_rom_path);
 	if (!rom_file) {
 		std::cerr << "Error: Could not open ROM file: " << _rom_path << std::endl;
@@ -66,7 +66,5 @@ void DMG::loop() {
 			avg_frame_time = 0us;
 			frames = 0;
 		}
-
-		context.update();
 	}
 }

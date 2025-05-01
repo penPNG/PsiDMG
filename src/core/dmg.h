@@ -8,19 +8,17 @@
 #include <filesystem>
 #include <chrono>
 #include <string>
-#include "context.h"
 
 class DMG{
 public:
 	DMG();
-	DMG(const std::string &rom_path, Context& context);
+	DMG(const std::string &rom_path);
 
 	void loop();
 
 	//void loadRom(const char* rom);
 
 	CPU* cpu;
-	Context context;
 	Memory ram;
 
 	std::vector<byte> rom;
