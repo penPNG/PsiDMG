@@ -1,7 +1,7 @@
 #include "context.h"
 #include <stdexcept>
 
-Context::Context(int _width, int _height, DMG* _dmg) : width(_width), height(_height), dmg(_dmg), io(ImGui::GetIO()) {
+Context::Context(int _width, int _height) : width(_width), height(_height), io(ImGui::GetIO()) {
 
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
 		throw std::runtime_error(getSDLError("Init"));
@@ -44,7 +44,7 @@ void Context::update() {
 	ImGui::NewFrame();
 
 	ImGui::ShowDemoWindow(&showdemo);
-	showDMGDebugger(dmg);
+	//showDMGDebugger(dmg);
 
 	SDL_UnlockTexture(texture);
 	SDL_RenderClear(renderer);
