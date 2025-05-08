@@ -1,6 +1,6 @@
 #pragma once
-#include "../core/ds.h"
-#include "../core/dmg.h"
+#include "ds.h"
+#include "dmg.h"
 #include "../imgui/imgui.h"
 #include "../imgui/imgui_impl_sdl3.h"
 #include "../imgui/imgui_impl_sdlrenderer3.h"
@@ -9,11 +9,14 @@
 
 class Context {
 public:
-	Context(int _width, int _height);
-	void update();
+	Context(int _width, int _height, DMG*);
+	bool update();
+	bool input();
+
+	int shutdown();
 
 //private:
-	static void showDMGDebugger(DMG*);
+	void showDMGDebugger();
 
 private:
 	SDL_Window* window;
@@ -21,6 +24,7 @@ private:
 	SDL_Texture* texture;
 
 	ImGuiIO& io;
+	DMG& dmg;
 
 	const int width;
 	const int height;
@@ -30,6 +34,8 @@ private:
 
 	int texturePitch;
 	void* texturePixels;
+
+	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
 	static const std::string getSDLError(const std::string& errorFunction) {
 		return "SDL_" + errorFunction + " Error: " + SDL_GetError();

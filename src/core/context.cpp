@@ -1,13 +1,9 @@
 #include "context.h"
 #include <stdexcept>
 
-Context::Context(int _width, int _height) : width(_width), height(_height), io(ImGui::GetIO()) {
+Context::Context(int _width, int _height, DMG* _dmg) : width(_width), height(_height), io(ImGui::GetIO()), dmg(*_dmg) {
 
-	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-		throw std::runtime_error(getSDLError("Init"));
-	}
-
-	window = SDL_CreateWindow("DMG", width, height, SDL_WINDOW_HIDDEN);
+	window = SDL_CreateWindow("DMG", width, height, SDL_WINDOW_INPUT_FOCUS);
 	if (window == NULL) {
 		throw std::runtime_error(getSDLError("CreateWindow"));
 	}
@@ -22,9 +18,7 @@ Context::Context(int _width, int _height) : width(_width), height(_height), io(I
 		throw std::runtime_error(getSDLError("CreateTexture"));
 	}
 
-	IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
-	(void)io;
+	io = ImGui::GetIO(); (void)io;
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
 
 	ImGui::StyleColorsDark();
@@ -38,25 +32,55 @@ Context::Context(int _width, int _height) : width(_width), height(_height), io(I
 	SDL_LockTexture(texture, NULL, &texturePixels, &texturePitch);
 }
 
-void Context::update() {
+bool Context::input() {
+	SDL_Event event;
+	while (SDL_PollEvent(&event)) {
+		ImGui_ImplSDL3_ProcessEvent(&event);
+		if (event.type == SDL_EVENT_QUIT) {
+			return true;
+		}
+		if (event.type == SDL_EVENT_WINDOW_CLOSE_REQUESTED && event.window.windowID == SDL_GetWindowID(window)) {
+			return true;
+		}
+	}
+	return false;
+}
+
+bool Context::update() {
+	bool done = input();
 	ImGui_ImplSDLRenderer3_NewFrame();
 	ImGui_ImplSDL3_NewFrame();
 	ImGui::NewFrame();
 
 	ImGui::ShowDemoWindow(&showdemo);
-	//showDMGDebugger(dmg);
+	showDMGDebugger();
 
-	SDL_UnlockTexture(texture);
+	ImGui::Render();
+	SDL_SetRenderDrawColorFloat(renderer, clear_color.x, clear_color.y, clear_color.z, clear_color.w);
+
+	//SDL_UnlockTexture(texture);
 	SDL_RenderClear(renderer);
-	SDL_RenderTexture(renderer, texture, NULL, NULL);
+	//SDL_RenderTexture(renderer, texture, NULL, NULL);
 	ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(), renderer);
 	SDL_RenderPresent(renderer);
-	SDL_LockTexture(texture, NULL, &texturePixels, &texturePitch);
+	//SDL_LockTexture(texture, NULL, &texturePixels, &texturePitch);
+	return done;
+}
+
+int Context::shutdown() {
+	ImGui_ImplSDLRenderer3_Shutdown();
+	ImGui_ImplSDL3_Shutdown();
+	ImGui::DestroyContext();
+	SDL_DestroyTexture(texture);
+	SDL_DestroyRenderer(renderer);
+	SDL_DestroyWindow(window);
+	SDL_Quit();
+	return 0;
 }
 
 
 // Windows
-void Context::showDMGDebugger(DMG* dmg) {
+void Context::showDMGDebugger() {
 	using namespace ImGui;
 	SetNextWindowSize(ImVec2(400, 300), ImGuiCond_FirstUseEver);
 	ImGuiInputTextFlags iflags = ImGuiInputTextFlags_ReadOnly | ImGuiInputTextFlags_CharsUppercase;
@@ -68,13 +92,13 @@ void Context::showDMGDebugger(DMG* dmg) {
 	Begin("DMG Debugger");
 	{
 		SeparatorText("Registers");
-		Text("A F: %02X %02X", dmg->cpu->get8(A), dmg->cpu->get8(F)); SameLine(0, 20);
-		Text("B C: %02X %02X", dmg->cpu->get8(B), dmg->cpu->get8(C)); Dummy(ImVec2(0, 10));
-		Text("D E: %02X %02X", dmg->cpu->get8(D), dmg->cpu->get8(E)); SameLine(0, 20);
-		Text("H L: %02X %02X", dmg->cpu->get8(H), dmg->cpu->get8(L)); Dummy(ImVec2(0, 10));
-		Text("SP: %04X  ", dmg->cpu->get16(SP)); SameLine(0, 20);
+		Text("A F: %02X %02X", dmg.cpu->get8(A), dmg.cpu->get8(F)); SameLine(0, 20);
+		Text("B C: %02X %02X", dmg.cpu->get8(B), dmg.cpu->get8(C)); Dummy(ImVec2(0, 10));
+		Text("D E: %02X %02X", dmg.cpu->get8(D), dmg.cpu->get8(E)); SameLine(0, 20);
+		Text("H L: %02X %02X", dmg.cpu->get8(H), dmg.cpu->get8(L)); Dummy(ImVec2(0, 10));
+		Text("SP: %04X  ", dmg.cpu->get16(SP)); SameLine(0, 20);
 		PushItemWidth(40);
-		Text("PC:"); SameLine(); InputScalar("##PCManip", ImGuiDataType_U16, &dmg->cpu->PC, NULL, NULL, "%04X", ImGuiInputTextFlags_CharsHexadecimal | ImGuiInputTextFlags_CharsUppercase);
+		Text("PC:"); SameLine(); InputScalar("##PCManip", ImGuiDataType_U16, &dmg.cpu->PC, NULL, NULL, "%04X", ImGuiInputTextFlags_CharsHexadecimal | ImGuiInputTextFlags_CharsUppercase);
 		PopItemWidth();
 	}
 	Dummy(ImVec2(200, 18)); SameLine();
@@ -82,7 +106,7 @@ void Context::showDMGDebugger(DMG* dmg) {
 		Button("Pause", ImVec2(70,0));
 		Text("Current Instruction"); SameLine();
 		PushItemWidth(30);
-		InputScalar("##Instruction", ImGuiDataType_U8, &dmg->ram.ram[dmg->cpu->PC], NULL, NULL, "%02X", iflags);
+		InputScalar("##Instruction", ImGuiDataType_U8, &dmg.ram.ram[dmg.cpu->PC], NULL, NULL, "%02X", iflags);
 		SameLine(0, 37); Button("Resume", ImVec2(70,0));
 		SameLine(0, 93); Checkbox("Lock Memory", &lockMem);
 		Text("Argument(s)"); SameLine();
@@ -92,7 +116,7 @@ void Context::showDMGDebugger(DMG* dmg) {
 			"advancing the program counter");
 		SameLine(0, 10);
 		if (Button("Step", ImVec2(70, 0))) {
-			dmg->cpu->exec(dmg->ram.readMem(dmg->cpu->PC++));
+			dmg.cpu->exec(dmg.ram.readMem(dmg.cpu->PC++));
 		}
 	}
 	SameLine(0, 10);
@@ -102,8 +126,8 @@ void Context::showDMGDebugger(DMG* dmg) {
 		static bool toScroll = false;
 		PushItemWidth(75);
 		if (lockScroll) {
-			InputScalar("##PCJump", ImGuiDataType_U16, &dmg->cpu->PC, NULL, NULL, "%04X", ImGuiInputTextFlags_CharsHexadecimal | ImGuiInputTextFlags_CharsUppercase);
-			jumpAddr = dmg->cpu->PC;
+			InputScalar("##PCJump", ImGuiDataType_U16, &dmg.cpu->PC, NULL, NULL, "%04X", ImGuiInputTextFlags_CharsHexadecimal | ImGuiInputTextFlags_CharsUppercase);
+			jumpAddr = dmg.cpu->PC;
 		}
 		else {
 			InputScalar("##JumpAddr", ImGuiDataType_U16, &jumpAddr, NULL, NULL, "%04X", ImGuiInputTextFlags_CharsHexadecimal | ImGuiInputTextFlags_CharsUppercase);
@@ -146,7 +170,7 @@ void Context::showDMGDebugger(DMG* dmg) {
 				for (int row = clipper.DisplayStart; row < clipper.DisplayEnd; row++) {
 					TableNextRow();
 					if (lockScroll) {
-						SetScrollFromPosY(GetCursorStartPos().y + dmg->cpu->PC, 0.25f);
+						SetScrollFromPosY(GetCursorStartPos().y + dmg.cpu->PC, 0.25f);
 					}
 					else {
 						if (toScroll) {
@@ -157,8 +181,8 @@ void Context::showDMGDebugger(DMG* dmg) {
 					for (int column = 0; column < 17; column++) {
 						TableSetColumnIndex(column);
 						if (lockScroll) {
-							if (row == (dmg->cpu->PC / 16)) {
-								if (column == (dmg->cpu->PC % 16) + 1) {
+							if (row == (dmg.cpu->PC / 16)) {
+								if (column == (dmg.cpu->PC % 16) + 1) {
 									TableSetBgColor(ImGuiTableBgTarget_CellBg, GetColorU32(ImVec4(0.26f, 0.59f, 0.98f, 1.0f)));
 								}
 								else {
@@ -182,49 +206,49 @@ void Context::showDMGDebugger(DMG* dmg) {
 						else {
 							addr = row * 16 + column - 1;
 							if (lockMem) {
-								Text("%02X", dmg->ram.readMem(addr));
+								Text("%02X", dmg.ram.readMem(addr));
 								//SDL_Log("0x%04X", addr);
 							}
 							else {
 								PushID(addr);
 								if (addr < 0x8000) {
 									// TODO: ROM Area
-									InputScalar("##", ImGuiDataType_U8, &dmg->ram.rom[addr], NULL, NULL, "%02X");
+									InputScalar("##", ImGuiDataType_U8, &dmg.ram.rom[addr], NULL, NULL, "%02X");
 								}
 								else if (addr < 0xA000) {
 									// Video Ram
-									InputScalar("##", ImGuiDataType_U8, &dmg->ram.vram[addr - 0x8000], NULL, NULL, "%02X");
+									InputScalar("##", ImGuiDataType_U8, &dmg.ram.vram[addr - 0x8000], NULL, NULL, "%02X");
 								}
 								else if (addr < 0xFF00) {
 									if (addr < 0xC000) {
 										// External Ram
-										InputScalar("##", ImGuiDataType_U8, &dmg->ram.ext_ram[addr - 0xA000], NULL, NULL, "%02X");
+										InputScalar("##", ImGuiDataType_U8, &dmg.ram.ext_ram[addr - 0xA000], NULL, NULL, "%02X");
 									}
 									else if (addr < 0xE000) {
 										// Work Ram
-										InputScalar("##", ImGuiDataType_U8, &dmg->ram.wram[addr - 0xC000], NULL, NULL, "%02X");
+										InputScalar("##", ImGuiDataType_U8, &dmg.ram.wram[addr - 0xC000], NULL, NULL, "%02X");
 									}
 									else if (addr < 0xFE00) {
 										// Echo of Work Ram
-										InputScalar("##", ImGuiDataType_U8, &dmg->ram.wram[addr - 0xE000], NULL, NULL, "%02X");
+										InputScalar("##", ImGuiDataType_U8, &dmg.ram.wram[addr - 0xE000], NULL, NULL, "%02X");
 									}
 									else if (addr < 0xFEA0) {
 										// OAM
-										InputScalar("##", ImGuiDataType_U8, &dmg->ram.oam[addr-0xFE00], NULL, NULL, "%02X");
+										InputScalar("##", ImGuiDataType_U8, &dmg.ram.oam[addr-0xFE00], NULL, NULL, "%02X");
 									}
 								}
 								else if (addr < 0xFF80) {
 									// IO Registers
-									InputScalar("##", ImGuiDataType_U8, &dmg->ram.io[addr&0xFF], NULL, NULL, "%02X");
+									InputScalar("##", ImGuiDataType_U8, &dmg.ram.io[addr&0xFF], NULL, NULL, "%02X");
 								}
 								else if (addr < 0xFFFF) {
 									// High Ram
-									InputScalar("##", ImGuiDataType_U8, &dmg->ram.hram[addr - 0xFF80], NULL, NULL, "%02X");
+									InputScalar("##", ImGuiDataType_U8, &dmg.ram.hram[addr - 0xFF80], NULL, NULL, "%02X");
 								}
 								else {
-									InputScalar("##", ImGuiDataType_U8, &dmg->ram.ram[addr], NULL, NULL, "%02X");
+									InputScalar("##", ImGuiDataType_U8, &dmg.ram.ram[addr], NULL, NULL, "%02X");
 								}
-								//InputScalar("##", ImGuiDataType_U8, &dmg->ram.ram[addr], NULL, NULL, "%02X");
+								//InputScalar("##", ImGuiDataType_U8, &dmg.ram.ram[addr], NULL, NULL, "%02X");
 								PopID();
 							}
 						}
