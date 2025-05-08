@@ -46,8 +46,8 @@ public:
 	// Ram Functions
 	// -------------
 	byte readMem(word);
+	word readMem16();
 	void writeMem(word, byte);
-
 	void push(word);
 	word pop();
 	// -------------

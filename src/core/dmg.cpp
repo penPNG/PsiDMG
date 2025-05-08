@@ -26,7 +26,7 @@ DMG::DMG() {
 	//printf("\nResult: %X", cpu->get8(A));
 }
 
-DMG::DMG(const std::string& _rom_path) {
+DMG::DMG(const std::string& _rom_path): cpu(new CPU(ram)) {
 	std::ifstream rom_file(_rom_path);
 	if (!rom_file) {
 		std::cerr << "Error: Could not open ROM file: " << _rom_path << std::endl;
@@ -39,7 +39,7 @@ DMG::DMG(const std::string& _rom_path) {
 	rom_file.read(reinterpret_cast<char*>(rom_data.data()), rom_size);
 	rom = rom_data;
 
-	cpu = new CPU(ram);
+	//cpu = new CPU(ram);
 }
 
 void DMG::loop() {

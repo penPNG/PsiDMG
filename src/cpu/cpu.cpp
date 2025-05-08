@@ -65,6 +65,12 @@ byte CPU::readMem(word addr) {
 	return ram.readMem(addr);
 }
 
+word CPU::readMem16() {
+	word data = readMem(PC++);
+	data |= readMem(PC++) << 8;
+	return data;
+}
+
 // Set Ram at Address
 void CPU::writeMem(word addr, byte data) {
 	ram.ram[addr] = data;
@@ -90,7 +96,7 @@ byte CPU::exec(byte op) {
 	switch (op) {
 		// Control Instructions
 		case 0x00: { return NOP(); } case 0x10: { return STOP(); }
-		case 0xCB: { return PREF(op); } case 0xF3: { return  DI(); }
+		case 0xCB: { return PREF(readMem(PC++)); } case 0xF3: { return  DI(); }
 		case 0xFB: { return EI(); } case 0x76: { return HALT(); }
 
 		// Load Instructions
@@ -98,8 +104,8 @@ byte CPU::exec(byte op) {
 		case 0x02: { return LDMR(get16(BC), A); } case 0x12: { return LDMR(get16(DE), A); } case 0x22: { return LDMR(registers.reg16[HL]++, A); } case 0x32: { return LDMR(registers.reg16[HL]--, A); }
 		case 0x0A: { return LDRM(A, get16(BC)); } case 0x1A: { return LDRM(A, get16(DE)); } case 0x2A: { return LDRM(A, registers.reg16[HL]++); } case 0x3A: { return LDRM(A, registers.reg16[HL]--); }
 				 // Immediate Loads
-		case 0x06: { return LDI(B, op); } case 0x16: { return LDI(D, op); } case 0x26: { return LDI(H, op); } case 0x36: { return LDMI(get16(HL), op); }
-		case 0x0E: { return LDI(C, op); } case 0x1E: { return LDI(E, op); } case 0x2E: { return LDI(L, op); } case 0x3E: { return LDI(A, op); }
+		case 0x06: { return LDI(B, readMem(PC++)); } case 0x16: { return LDI(D, readMem(PC++)); } case 0x26: { return LDI(H, readMem(PC++)); } case 0x36: { return LDMI(get16(HL), readMem(PC++)); }
+		case 0x0E: { return LDI(C, readMem(PC++)); } case 0x1E: { return LDI(E, readMem(PC++)); } case 0x2E: { return LDI(L, readMem(PC++)); } case 0x3E: { return LDI(A, readMem(PC++)); }
 				 // 0x4X
 		case 0x40: { return LD(B, B); } case 0x41: { return LD(B, C); } case 0x42: { return LD(B, D); } case 0x43: { return LD(B, E); }
 		case 0x44: { return LD(B, H); } case 0x45: { return LD(B, L); } case 0x46: { return LDRM(B, get16(HL)); } case 0x47: { return LD(B, A); }
@@ -121,15 +127,15 @@ byte CPU::exec(byte op) {
 		case 0x78: { return LD(A, B); } case 0x79: { return LD(A, C); } case 0x7A: { return LD(A, D); } case 0x7B: { return LD(A, E); }
 		case 0x7C: { return LD(A, H); } case 0x7D: { return LD(A, L); } case 0x7E: { return LDRM(A, get16(HL)); } case 0x7F: { return LD(A, A); }
 				 // Relative Memory Loads
-		case 0xE0: { return LDAM(op); } case 0xF0: { return LDMA(op); }
+		case 0xE0: { return LDAM(readMem(PC++)); } case 0xF0: { return LDMA(readMem(PC++)); }
 		case 0xE2: { return LDMR(0xFF00 + get8(C), A); } case 0xF2: { return LDRM(A, 0xFF00 + get8(C)); }
 				 // Immediate Memory Loads
-		case 0xEA: { return LDIA(op); } case 0xFA: { return LDAI(op); }
+		case 0xEA: { return LDIA(readMem16()); } case 0xFA: { return LDAI(readMem16()); }
 				 // 16 Bit Loads
-		case 0x01: { return LD16(BC, op); } case 0x11: { return LD16(DE, op); } case 0x21: { return LD16(HL, op); } case 0x31: { return LD16(SP, op); }
-		case 0x08: { return LD16MSP(op); }
+		case 0x01: { return LD16(BC, readMem16()); } case 0x11: { return LD16(DE, readMem16()); } case 0x21: { return LD16(HL, readMem16()); } case 0x31: { return LD16(SP, readMem16()); }
+		case 0x08: { return LD16MSP(readMem16()); }
 				 // Special Loads
-		case 0xF8: { return LD16HLSP(op); } case 0xF9: { return LD16SPHL(); }
+		case 0xF8: { return LD16HLSP(readMem(PC++)); } case 0xF9: { return LD16SPHL(); }
 				 // Push / Pop
 		case 0xC1: { return POP(BC); } case 0xD1: { return POP(DE); } case 0xE1: { return POP(HL); } case 0xF1: { return POP(AF); }
 		case 0xC5: { return PUSH(BC); } case 0xD5: { return PUSH(DE); } case 0xE5: { return PUSH(HL); } case 0xF5: { return PUSH(AF); }
@@ -162,8 +168,8 @@ byte CPU::exec(byte op) {
 		case 0x05: { return DEC(B); } case 0x0D: { return DEC(C); } case 0x15: { return DEC(D); } case 0x1D: { return DEC(E); }
 		case 0x25: { return DEC(H); } case 0x2D: { return DEC(L); } case 0x35: { return DECM(get16(HL)); } case 0x3D: { return DEC(A); }
 				 // Immediates
-		case 0xC6: { return ADDI(op); } case 0xCE: { return ADCI(op); } case 0xD6: { return SUBI(op); } case 0xDE: { return SBCI(op); }
-		case 0xE6: { return ANDI(op); } case 0xEE: { return XORI(op); } case 0xF6: { return ORI(op); } case 0xFE: { return CPI(op); }
+		case 0xC6: { return ADDI(readMem(PC++)); } case 0xCE: { return ADCI(readMem(PC++)); } case 0xD6: { return SUBI(readMem(PC++)); } case 0xDE: { return SBCI(readMem(PC++)); }
+		case 0xE6: { return ANDI(readMem(PC++)); } case 0xEE: { return XORI(readMem(PC++)); } case 0xF6: { return ORI(readMem(PC++)); } case 0xFE: { return CPI(readMem(PC++)); }
 				 // Special Arithmetic
 		case 0x27: { return DAA(); } case 0x2F: { return CPL(); } case 0x37: { return SCF(); } case 0x3F: { return CCF(); }
 				 // 16 Bit Increment
@@ -177,14 +183,14 @@ byte CPU::exec(byte op) {
 
 		// Jumps / Calls
 				 // Relative Jumps
-		case 0x18: { return JR(op); }
-		case 0x20: { return JRN(flagZ, op); } case 0x28: { return JRS(flagZ, op); } case 0x30: { return JRN(flagC, op); } case 0x38: { return JRS(flagC, op); }
+		case 0x18: { return JR(readMem(PC++)); }
+		case 0x20: { return JRN(flagZ, readMem(PC++)); } case 0x28: { return JRS(flagZ, readMem(PC++)); } case 0x30: { return JRN(flagC, readMem(PC++)); } case 0x38: { return JRS(flagC, readMem(PC++)); }
 				 // Absolute Jumps
-		case 0xC3: { return JP(op); } case 0xE9: { return JPHL(); }
-		case 0xC2: { return JPN(flagZ, op); } case 0xCA: { return JPS(flagZ, op); } case 0xD2: { return JPN(flagC, op); } case 0xDA: { return JPS(flagC, op); }
+		case 0xC3: { return JP(readMem16()); } case 0xE9: { return JPHL(); }
+		case 0xC2: { return JPN(flagZ, readMem16()); } case 0xCA: { return JPS(flagZ, readMem16()); } case 0xD2: { return JPN(flagC, readMem16()); } case 0xDA: { return JPS(flagC, readMem16()); }
 				 // Calls
-		case 0xCD: { return CALL(op); }
-		case 0xC4: { return CLLN(flagZ, op); } case 0xCC: { return CLLS(flagZ, op); } case 0xD4: { return CLLN(flagC, op); } case 0xDC: { return CLLS(flagC, op); }
+		case 0xCD: { return CALL(readMem16()); }
+		case 0xC4: { return CLLN(flagZ, readMem16()); } case 0xCC: { return CLLS(flagZ, readMem16()); } case 0xD4: { return CLLN(flagC, readMem16()); } case 0xDC: { return CLLS(flagC, readMem16()); }
 				 // Returns
 		case 0xC9: { return RET(); } case 0xD9: { return RETI(); }
 		case 0xC0: { return RTN(flagZ); } case 0xC8: { return RTS(flagZ); } case 0xD0: { return RTN(flagC); } case 0xD8: { return RTS(flagC); }
@@ -192,6 +198,7 @@ byte CPU::exec(byte op) {
 		case 0xC7: { return RST(0x00); } case 0xCF: { return RST(0x08); } case 0xD7: { return RST(0x10); } case 0xDF: { return RST(0x18); }
 		case 0xE7: { return RST(0x20); } case 0xEF: { return RST(0x28); } case 0xF7: { return RST(0x30); } case 0xFF: { return RST(0x38); }
 	}
+	printf("Unknown Instruction: %x\n", op);
 	return 4;
 }
 
