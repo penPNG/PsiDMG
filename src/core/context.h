@@ -31,15 +31,14 @@ const int width;
 const int height;
 
 bool showdemo = true;
-bool running = true;
+bool running = false;
 
 int texturePitch;
 void* texturePixels;
 
-static constexpr int cycles = 40;// 69920;
+static constexpr int cycles = 1000;// 69920;
 int oCycles = 0;
 
-// Remove `using namespace std::chrono;` from here and use fully qualified names instead
 std::chrono::microseconds max_frame_time = std::chrono::microseconds(0);
 std::chrono::microseconds avg_frame_time = std::chrono::microseconds(0);
 int frames = 0;

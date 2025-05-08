@@ -51,17 +51,19 @@ bool Context::update() {
 
 	const auto start_time = std::chrono::steady_clock::now();
 
-	int tCycles = (cycles + oCycles);
-	oCycles = dmg.hardwareCycle(tCycles);
+	if (running) {
+		int tCycles = (cycles + oCycles);
+		oCycles = dmg.hardwareCycle(tCycles);
+	}
 
-	auto frame_time = duration_cast<std::chrono::microseconds > (std::chrono::steady_clock::now() - start_time);
+	/*auto frame_time = duration_cast<std::chrono::microseconds > (std::chrono::steady_clock::now() - start_time);
 	max_frame_time = std::max(max_frame_time, frame_time);
 	avg_frame_time += frame_time;
 	if (++frames == 60) {
 		max_frame_time = std::chrono::microseconds(0);
 		avg_frame_time = std::chrono::microseconds(0);
 		frames = 0;
-	}
+	}*/
 
 	ImGui_ImplSDLRenderer3_NewFrame();
 	ImGui_ImplSDL3_NewFrame();
@@ -118,17 +120,22 @@ void Context::showDMGDebugger() {
 	}
 	Dummy(ImVec2(200, 18)); SameLine();
 	{
-		Button("Pause", ImVec2(70,0));
+		if (Button("Pause", ImVec2(70, 0))) {
+			running = false;
+		}
 		Text("Current Instruction"); SameLine();
 		PushItemWidth(30);
 		InputScalar("##Instruction", ImGuiDataType_U8, &dmg.ram.ram[dmg.cpu->PC], NULL, NULL, "%02X", iflags);
-		SameLine(0, 37); Button("Resume", ImVec2(70,0));
+		SameLine(0, 37); if (Button("Resume", ImVec2(70, 0))) {
+			running = true;
+		}
 		SameLine(0, 93); Checkbox("Lock Memory", &lockMem);
 		Text("Argument(s)"); SameLine();
 		InputScalar("##Arguments", ImGuiDataType_U8, &v, NULL, NULL, "%02X", iflags);
 		PopItemWidth(); SameLine(0, 26);
 		Button("Execute"); SetItemTooltip("Execute the current instruction without\n"
-			"advancing the program counter");
+			"advancing the program counter\n"
+			"NOT WORKING!!!");
 		SameLine(0, 10);
 		if (Button("Step", ImVec2(70, 0))) {
 			dmg.cpu->exec(dmg.ram.readMem(dmg.cpu->PC++));
