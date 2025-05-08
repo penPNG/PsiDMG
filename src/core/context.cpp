@@ -56,15 +56,6 @@ bool Context::update() {
 		oCycles = dmg.hardwareCycle(tCycles);
 	}
 
-	/*auto frame_time = duration_cast<std::chrono::microseconds > (std::chrono::steady_clock::now() - start_time);
-	max_frame_time = std::max(max_frame_time, frame_time);
-	avg_frame_time += frame_time;
-	if (++frames == 60) {
-		max_frame_time = std::chrono::microseconds(0);
-		avg_frame_time = std::chrono::microseconds(0);
-		frames = 0;
-	}*/
-
 	ImGui_ImplSDLRenderer3_NewFrame();
 	ImGui_ImplSDL3_NewFrame();
 	ImGui::NewFrame();
