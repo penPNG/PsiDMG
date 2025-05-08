@@ -62,6 +62,7 @@ void CPU::setC(bool c) { if (c) { set8(F, flagC); } else { registers.reg8[F] &= 
 
 // Get Ram from Address
 byte CPU::readMem(word addr) {
+	if (ram.io[TIMA]++ == 0) ram.io[TIMA] = ram.io[TMA];
 	return ram.readMem(addr);
 }
 
@@ -73,7 +74,7 @@ word CPU::readMem16() {
 
 // Set Ram at Address
 void CPU::writeMem(word addr, byte data) {
-	ram.ram[addr] = data;
+	ram.writeMem(addr, data);
 }
 
 // Push Word to Stack

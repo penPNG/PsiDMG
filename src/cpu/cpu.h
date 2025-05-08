@@ -16,7 +16,9 @@ public:
 
 	int runFor(int cycles) {
 		while (cycles > 0) {
-			cycles -= exec(ram.readMem(PC++));
+			printf("0x%04X: ", PC);
+			byte op = readMem(PC++);
+			cycles -= exec(op);
 			printf(" ");
 		}
 		return cycles;

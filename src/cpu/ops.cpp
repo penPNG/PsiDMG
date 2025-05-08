@@ -37,7 +37,7 @@ byte CPU::LDRM(reg8 reg, word addr) {
 
 // Load to Memory from Register
 byte CPU::LDMR(word addr, reg8 reg) {
-	printf("LDMR: %d %d", addr, reg);
+	printf("LDMR: %X %d", addr, reg);
 
 	writeMem(addr, get8(reg));
 	return 8;

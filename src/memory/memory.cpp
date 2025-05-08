@@ -174,7 +174,7 @@ byte Memory::readMem(word addr) {
 void Memory::writeMem(word addr, byte data) {
 	if (addr < 0x8000) {
 		// Inaccessible ROM
-		rom[addr] = data;
+		//rom[addr] = data;
 	}
 	else if (addr < 0xA000) {
 		// Video Ram
@@ -183,7 +183,7 @@ void Memory::writeMem(word addr, byte data) {
 	else if (addr < 0xFF00) {
 		if (addr < 0xC000) {
 			// External Ram
-			ext_ram[addr] = data;
+			ext_ram[addr - 0xA000] = data;
 		}
 		else if (addr < 0xE000) {
 			// Work Ram
