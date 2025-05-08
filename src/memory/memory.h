@@ -18,12 +18,12 @@ public:
 	// Write to IO
 	void writeIO(word addr, byte data);
 
-	std::vector<byte> rom;
-	std::vector<byte> ext_ram;
-	std::vector<byte> oam;
-	std::vector<byte> vram;	// 8 KiB Video RAM
-	std::vector<byte> wram;	// 8 KiB Work RAM
-	std::vector<byte> hram;	// 127 Bytes High RAM
+	std::vector<byte> rom;		// Cartridge ROM
+	std::vector<byte> ext_ram;	// External  Cartridge RAM
+	std::vector<byte> oam;		// Object Attribute Memory
+	std::vector<byte> vram;		// 8 KiB Video RAM
+	std::vector<byte> wram;		// 8 KiB Work RAM
+	std::vector<byte> hram;		// 127 Bytes High RAM
 
 	byte ram[0x10000];
 	byte io[0x100]{ 0 };
