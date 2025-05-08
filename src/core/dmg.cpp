@@ -27,7 +27,8 @@ DMG::DMG() {
 }
 
 DMG::DMG(const std::string& _rom_path): ram(), cpu(new CPU(ram)) {
-	std::ifstream rom_file(_rom_path);
+	//std::ifstream rom_file(_rom_path);
+	FILE* rom_file = fopen(_rom_path.c_str(), "rb");
 	if (!rom_file) {
 		std::cerr << "Error: Could not open ROM file: " << _rom_path << std::endl;
 		return;
@@ -36,10 +37,10 @@ DMG::DMG(const std::string& _rom_path): ram(), cpu(new CPU(ram)) {
 	const auto rom_size = std::filesystem::file_size(_rom_path);
 	
 	std::vector<byte> rom_data(rom_size / sizeof(byte));
-	rom_file.read(reinterpret_cast<char*>(rom_data.data()), rom_size);
-	std::vector<byte> rom = rom_data;
+	fread(rom_data.data(), rom_size, 1, rom_file);
+	//rom_file.read(reinterpret_cast<char*>(rom_data.data()), rom_size);
 
-	if (rom.size() > 0x142) {
+	if (rom_data.size() > 0x142) {
 
 		ram.rom = rom_data;
 	}

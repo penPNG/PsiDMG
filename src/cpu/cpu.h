@@ -17,6 +17,7 @@ public:
 	int runFor(int cycles) {
 		while (cycles > 0) {
 			cycles -= exec(ram.readMem(PC++));
+			printf(" ");
 		}
 		return cycles;
 	}
