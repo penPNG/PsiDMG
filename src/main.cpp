@@ -10,7 +10,7 @@
 #include <iostream>
 
 int main(char* argv) {
-	DMG* dmg = new DMG();
+	DMG* dmg = new DMG("../../../Tetris.gb");
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
 		throw std::runtime_error(SDL_GetError());
 	}
@@ -24,7 +24,8 @@ int main(char* argv) {
 
 	bool done = false;
 	while (!done) {
-		 done = context->update();
+		done = context->update();
+	}
 
 	delete(dmg);
 

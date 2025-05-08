@@ -2,8 +2,8 @@
 
 DMG::DMG() {
 	cpu = new CPU(ram);
-	printf("  Standard Instructions\n");
-	int c;
+	/*printf("  Standard Instructions\n");
+	int c;*/
 	/*for (int i = 0; i < 256; i++) {
 		printf("  $%X ", i);
 		c = cpu->exec(i);
@@ -26,7 +26,7 @@ DMG::DMG() {
 	//printf("\nResult: %X", cpu->get8(A));
 }
 
-DMG::DMG(const std::string& _rom_path): cpu(new CPU(ram)) {
+DMG::DMG(const std::string& _rom_path): ram(), cpu(new CPU(ram)) {
 	std::ifstream rom_file(_rom_path);
 	if (!rom_file) {
 		std::cerr << "Error: Could not open ROM file: " << _rom_path << std::endl;
@@ -37,9 +37,17 @@ DMG::DMG(const std::string& _rom_path): cpu(new CPU(ram)) {
 	
 	std::vector<byte> rom_data(rom_size / sizeof(byte));
 	rom_file.read(reinterpret_cast<char*>(rom_data.data()), rom_size);
-	rom = rom_data;
+	std::vector<byte> rom = rom_data;
 
-	//cpu = new CPU(ram);
+	if (rom.size() > 0x142) {
+
+		ram.rom = rom_data;
+	}
+}
+
+int DMG::hardwareCycle(int cycles) {
+	int oCycles = cpu->runFor(cycles);
+	return oCycles;
 }
 
 void DMG::loop() {

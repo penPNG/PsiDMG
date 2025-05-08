@@ -6,38 +6,47 @@
 #include "../imgui/imgui_impl_sdlrenderer3.h"
 #include "SDL3/SDL.h"
 #include <string>
+#include <chrono>
 
 class Context {
 public:
-	Context(int _width, int _height, DMG*);
-	bool update();
-	bool input();
+Context(int _width, int _height, DMG*);
+bool update();
+bool input();
 
-	int shutdown();
+int shutdown();
 
 //private:
-	void showDMGDebugger();
+void showDMGDebugger();
 
 private:
-	SDL_Window* window;
-	SDL_Renderer* renderer;
-	SDL_Texture* texture;
+SDL_Window* window;
+SDL_Renderer* renderer;
+SDL_Texture* texture;
 
-	ImGuiIO& io;
-	DMG& dmg;
+ImGuiIO& io;
+DMG& dmg;
 
-	const int width;
-	const int height;
+const int width;
+const int height;
 
-	bool showdemo = true;
-	bool running = true;
+bool showdemo = true;
+bool running = true;
 
-	int texturePitch;
-	void* texturePixels;
+int texturePitch;
+void* texturePixels;
 
-	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+static constexpr int cycles = 40;// 69920;
+int oCycles = 0;
 
-	static const std::string getSDLError(const std::string& errorFunction) {
-		return "SDL_" + errorFunction + " Error: " + SDL_GetError();
-	}
+// Remove `using namespace std::chrono;` from here and use fully qualified names instead
+std::chrono::microseconds max_frame_time = std::chrono::microseconds(0);
+std::chrono::microseconds avg_frame_time = std::chrono::microseconds(0);
+int frames = 0;
+
+ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+
+static const std::string getSDLError(const std::string& errorFunction) {
+	return "SDL_" + errorFunction + " Error: " + SDL_GetError();
+}
 };

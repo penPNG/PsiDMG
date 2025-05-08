@@ -70,6 +70,62 @@ Memory::Memory() :
 	}
 }
 
+Memory::Memory(std::vector<byte> _rom) :
+	rom(_rom),
+	ext_ram(0x2000),
+	oam(0xA0),
+	vram(0x2000),
+	wram(0x2000),
+	hram(0x7F) {
+	for (int i = 0; i < 0x100; i++) {
+		io[i] = 0xFF;
+	}
+	io[P1] = 0xCF;
+	io[SB] = 0x00;
+	io[SC] = 0x7E;
+	io[DIV] = 0xAB;
+	io[TIMA] = 0x00;
+	io[TMA] = 0x00;
+	io[TAC] = 0xF8;
+	io[IF] = 0xE1;
+	io[NR10] = 0x80;
+	io[NR11] = 0xBF;
+	io[NR12] = 0xF3;
+	io[NR13] = 0xFF;
+	io[NR14] = 0xBF;
+	io[NR21] = 0x3F;
+	io[NR22] = 0x00;
+	io[NR23] = 0xFF;
+	io[NR24] = 0xBF;
+	io[NR30] = 0x7F;
+	io[NR31] = 0xFF;
+	io[NR32] = 0x9F;
+	io[NR33] = 0xff;
+	io[NR34] = 0xBF;
+	io[NR41] = 0xFF;
+	io[NR42] = 0x00;
+	io[NR43] = 0x00;
+	io[NR44] = 0xBF;
+	io[NR50] = 0x77;
+	io[NR51] = 0xF3;
+	io[NR52] = 0xF1;
+	io[LCDC] = 0x91;
+	io[STAT] = 0x85;
+	io[SCY] = 0x00;
+	io[SCX] = 0x00;
+	io[LY] = 0x00;
+	io[LYC] = 0x00;
+	io[DMA] = 0xFF;
+	io[BGP] = 0xFC;
+	io[OBP0] = 0x00;
+	io[OBP1] = 0x00;
+	io[WY] = 0x00;
+	io[WX] = 0x00;
+	for (word i = 0xff4d; i < 0xffff; i++) {
+		ram[i] = 0;
+	}
+}
+
 // Read from Ram
 byte Memory::readMem(word addr) {
 	if (addr < 0x8000) {

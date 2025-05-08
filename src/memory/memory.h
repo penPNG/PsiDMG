@@ -5,6 +5,7 @@
 class Memory {
 public:
 	Memory();
+	Memory(std::vector<byte> _rom);
 
 	// Read from Ram
 	byte readMem(word addr);

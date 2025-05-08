@@ -16,12 +16,13 @@ public:
 
 	void loop();
 
+	int hardwareCycle(int cycles);
+
 	//void loadRom(const char* rom);
 
 	CPU* cpu;
 	Memory ram;
 
-	std::vector<byte> rom;
 
 private:
 	bool quit = false;
